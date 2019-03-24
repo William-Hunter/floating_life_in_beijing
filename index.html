@@ -1,26 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" >
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <script type="text/javascript" src="config.js"></script>
+    <script type="text/javascript" src="./js/jquery.js" ></script>
+    <script type="text/javascript" src="./js/bootstrap.js" ></script>
+    <script type="text/javascript" src="./js/vue.js" ></script>
 
-    <title>Title</title>
+    <title>北京欢迎你，大门敞开让你进</title>
 </head>
 <body>
-<p>
-您扮演一位从外地到北京谋生的青年。一开始，您只有2000元钱，并且还欠地下钱庄5500元债务。这些债务每天的利息高达10%，如果不即时还清，
-    钱庄会叫打手来扁你。您可能牺牲在北京街头。您决定在北京各车站倒卖各种黑市物资来发家致富，不仅还掉债务，还要荣登北京富豪榜。
-</p>
-<p>
-    您只能在北京呆40天，每次奔走一个黑市算一天。一开始，您租的房子只能放一百个东西。您会在北京遭遇各种事件，您需要与流氓、小偷、凶手、贪官、
-    骗子等斗志斗勇，还需要在北京恶劣的自然环境下设法生存下来。
-</p>
-
-
-
-
-
+<div class="container-fluid">
+    <div class="col-md-offset-2 col-md-6">
+        <h1>北京浮生记</h1>
+    <p>
+        您扮演一位从外地到北京谋生的青年。一开始，您只有2000元钱，并且还欠地下钱庄5500元债务。这些债务每天的利息高达10%，如果不即时还清，
+        钱庄会叫打手来扁你。您可能牺牲在北京街头。您决定在北京各地铁站倒卖各种黑市物资来发家致富，不仅还掉债务，还要荣登北京富豪榜。
+    </p>
+    <p>
+        您只能在北京呆40天，每次奔走一个黑市算一天。一开始，您租的房子只能放一百个东西。您会在北京遭遇各种事件，您需要与流氓、小偷、凶手、贪官、
+        骗子等斗志斗勇，还需要在北京恶劣的自然环境下设法生存下来。
+    </p>
+        <button id="station" @click="jumpToStation" type="button" class="btn btn-primary btn-lg btn-block">提好您的行李，前往地铁站</button>
+    </div>
+</div>
 
 </body>
+
+<script>
+
+    var station = new Vue({
+        el: '#station',
+        methods: {
+            jumpToStation: function () {
+                window.location.href="./station.html"
+            }
+        }
+    })
+
+
+
+
+
+</script>
+
 </html>
