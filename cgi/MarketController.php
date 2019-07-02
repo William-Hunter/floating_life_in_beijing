@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2019/3/24
- * Time: 21:45
+ * User: william
+ * Date: 2019/7/2
+ * Time: 17:18
  */
 
 
@@ -11,9 +11,8 @@ require_once('util/mysql.php');
 header("content-type", "application/json");
 
 
-$arr=query("SELECT * FROM place");
-
-echo json_encode($arr);
+$arr=query("SELECT * FROM place WHERE id=?");
 
 
 ?>
+

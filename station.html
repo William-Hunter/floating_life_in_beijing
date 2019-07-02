@@ -19,20 +19,17 @@
     <div id="stats" class="col-md-offset-2 col-md-6">
         <div v-for="stat in list">
             <br><br>
-            <button name="station" v-on:click="arriveStation" type="button" class="btn btn-primary">
-                {{stat.title}}
+            <button name="station" v-on:click="arriveStation(stat.id)" type="button" class="btn btn-primary">
+                {{stat.name}}
             </button>
         </div>
-
 
     </div>
 </div>
 
 
 <script>
-
     $(function () {
-
         var station_list
         $.ajax({
             url: './cgi/StationController.php',
@@ -41,23 +38,25 @@
             async: false,
             success: function (data) {
                 station_list = data
+                console.log("1")
             }
         })
+        console.log("2")
         var stats = new Vue({
             el: '#stats',
             data: {
                 list: station_list
-            }
-        })
-        var station = new Vue({
-            el: 'button[name="station"]',
+            },
             methods: {
-                arriveStation: function () {
-                    console.log("id", id)
-                    //    '{{stat.id}}'
+                arriveStation: function (id) {
+                    console.log("id:"+id)
+                    window.location.href = "./market.html?id="+id
                 }
             }
         })
+        console.log("3")
+
+
 
     })
 

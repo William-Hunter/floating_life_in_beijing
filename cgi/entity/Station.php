@@ -6,9 +6,9 @@
  * Time: 21:49
  */
 
-class Station {
+class Place {
     public $id;
-    public $title;
+    public $name;
 }
 
 ?>

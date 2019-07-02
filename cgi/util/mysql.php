@@ -7,31 +7,28 @@
  */
 
 
-static $IP = "192.168.0.254";
+static $IP = "118.25.212.166";
 static $user = "root";
-static $passwd = "WritenGoodCode";
+static $passwd = "WeAreHacker2019;;";
 static $DB = "float_left";
-
+static $port = 3304;
 
 function query ($sql) {
-    global $IP, $user, $passwd, $DB;
-    $mysqli = new mysqli($IP, $user, $passwd, $DB);
+    global $IP, $user, $passwd, $DB,$port;
+    $mysqli = new mysqli($IP, $user, $passwd, $DB,$port);
 //    printf("B\n");
     if ($mysqli->connect_errno) {
         printf("Connect failed: %s\n", $mysqli->connect_error);
         exit();
     }
-//    printf("C\n");
     $result = array();
     /* Select queries return a resultset */
     if ($resultset = $mysqli->query($sql)) {
-
         while ($row = mysqli_fetch_array($resultset, MYSQLI_ASSOC)) {
             $result[]=$row;
         }
         $resultset->close();
     }
-//    printf("D\n");
     mysqli_close($mysqli);
     return $result;
 }
