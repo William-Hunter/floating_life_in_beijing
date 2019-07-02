@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <script type="text/javascript" src="config.js"></script>
+    <script type="text/javascript" src="./js/jquery.js"></script>
+    <script type="text/javascript" src="./js/bootstrap.js"></script>
+    <script type="text/javascript" src="./js/vue.js"></script>
+
+    <title>黑市</title>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="col-md-offset-2 col-md-6">
+        A
+    </div>
+    <div class="col-md-offset-2 col-md-6">
+        B
+    </div>
+</div>
+
+</body>
+
+<script>
+
+    var station = new Vue({
+        el: '#station',
+        methods: {
+            jumpToStation: function () {
+                window.location.href = "./station.html"
+            }
+        }
+    })
+
+
+</script>
+
+</html>

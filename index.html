@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" >
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,25 +8,32 @@
 
     <link rel="stylesheet" href="./css/bootstrap.css">
     <script type="text/javascript" src="config.js"></script>
-    <script type="text/javascript" src="./js/jquery.js" ></script>
-    <script type="text/javascript" src="./js/bootstrap.js" ></script>
-    <script type="text/javascript" src="./js/vue.js" ></script>
+    <script type="text/javascript" src="./js/jquery.js"></script>
+    <script type="text/javascript" src="./js/bootstrap.js"></script>
+    <script type="text/javascript" src="./js/vue.js"></script>
 
     <title>北京欢迎你，大门敞开让你进</title>
 </head>
 <body>
 <div class="container-fluid">
     <div class="col-md-offset-2 col-md-6">
+        <br><br>
         <h1>北京浮生记</h1>
-    <p>
-        您扮演一位从外地到北京谋生的青年。一开始，您只有2000元钱，并且还欠地下钱庄5500元债务。这些债务每天的利息高达10%，如果不即时还清，
-        钱庄会叫打手来扁你。您可能牺牲在北京街头。您决定在北京各地铁站倒卖各种黑市物资来发家致富，不仅还掉债务，还要荣登北京富豪榜。
-    </p>
-    <p>
-        您只能在北京呆40天，每次奔走一个黑市算一天。一开始，您租的房子只能放一百个东西。您会在北京遭遇各种事件，您需要与流氓、小偷、凶手、贪官、
-        骗子等斗志斗勇，还需要在北京恶劣的自然环境下设法生存下来。
-    </p>
-        <button id="station" @click="jumpToStation" type="button" class="btn btn-primary btn-lg btn-block">提好您的行李，前往地铁站</button>
+        <br>
+        <p>
+            您是一位来自中国偏远地区的奋斗青年，奔波于中国各地去实现人生价值。为了离开那个小地方并且有一笔初始资金，您借了地下钱庄5000￥元钱，
+            这些钱，每天都有10%的复利，如果您还不上钱，地下钱庄会纠集一群地痞流氓来打你，你可能牺牲死在神州大地，
+            为了早日实现梦想并且回到家乡娶到青梅竹马、两小无猜的梦蝶，您决定在中国各地倒卖黑市物品来迅速赚取金钱以实现“中国梦”。
+        </p>
+        <p>
+            你只有40天的时间，否则梦蝶就要被她爸嫁给别人了，一开始，你的仓库只能放100个东西，每次奔走一个黑市是一天，在中国做生意难上加难，
+            你要与各种“中国国情”做周旋，买通执法部门，让他们对你的“生意”睁一只眼闭一只眼。
+        </p>
+
+        <br><br><br><br>
+        <button id="station" @click="jumpToStation" type="button" class="btn btn-primary btn-lg btn-block">
+            提好您的行李，前往地铁站
+        </button>
     </div>
 </div>
 
@@ -38,13 +45,10 @@
         el: '#station',
         methods: {
             jumpToStation: function () {
-                window.location.href="./station.html"
+                window.location.href = "./station.html"
             }
         }
     })
-
-
-
 
 
 </script>

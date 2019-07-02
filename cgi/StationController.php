@@ -7,20 +7,36 @@
  */
 
 require_once('entity/Station.php');
-header("content-type","application/json");
+require_once('util/mysql.php');
+header("content-type", "application/json");
 
 
-$station1=new Station();
-$station1->id='1';
-$station1->title="天安门";
+$arr=query("SELECT * FROM place");
 
-$station2=new Station();
-$station2->id='2';
-$station2->title="中关村";
+//$arr = array();
+//$station = new Station();
+//$station->id = '1';
+//$station->title = "昆明老街";
+//array_push($arr, $station);
+//
+//$station = new Station();
+//$station->id = '2';
+//$station->title = "北京王府井";
+//array_push($arr, $station);
+//
+//
+//$station = new Station();
+//$station->id = '2';
+//$station->title = "新疆喀什";
+//array_push($arr, $station);
+//
+//
+//$station = new Station();
+//$station->id = '2';
+//$station->title = "香港九龙";
+//array_push($arr, $station);
 
-$arr = array($station1,$station2);
 
 echo json_encode($arr);
-
 
 ?>
