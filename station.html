@@ -19,7 +19,7 @@
     <div id="stats" class="col-md-offset-2 col-md-6">
         <div v-for="stat in list">
             <br><br>
-            <button name="station" v-on:click="arriveStation(stat.id)" type="button" class="btn btn-primary">
+            <button name="station" v-bind:href="http://www.baidu.com" type="button" class="btn btn-primary">
                 {{stat.name}}
             </button>
         </div>
@@ -27,6 +27,7 @@
     </div>
 </div>
 
+<!--v-on:click="arriveStation(stat.id)"-->
 
 <script>
     $(function () {
