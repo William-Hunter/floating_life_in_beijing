@@ -6,16 +6,11 @@
  * Time: 16:20
  */
 
-
-static $IP = "118.25.212.166";
-static $user = "root";
-static $passwd = "WeAreHacker2019;;";
-static $DB = "float_left";
-static $port = 3304;
+require_once('config.php');
 
 function query ($sql) {
-    global $IP, $user, $passwd, $DB,$port;
-    $mysqli = new mysqli($IP, $user, $passwd, $DB,$port);
+    global $DB_IP, $DB_user, $DB_passwd, $DB_name,$DB_port;
+    $mysqli = new mysqli($DB_IP, $DB_user, $DB_passwd, $DB_name,$DB_port);
 //    printf("B\n");
     if ($mysqli->connect_errno) {
         printf("Connect failed: %s\n", $mysqli->connect_error);
