@@ -19,6 +19,5 @@ function GetQueryString(name) {
 }
 
 var API = {
-    marketProducts: web_root + '/cgi/MarketController.php?func=market_products',
-    mystock: web_root + '/cgi/MarketController.php?func=mystock'
+    marketInit: web_root + '/cgi/MarketController.php?func=marketInit',
 }
