@@ -7,60 +7,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <link rel="stylesheet" href="./css/bootstrap.css">
-    <script type="text/javascript" src="config.js"></script>
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/bootstrap.js"></script>
     <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
 
     <title>请选择车站</title>
 </head>
 <body>
 <div class="container-fluid">
-    <div id="stats" class="col-md-offset-2 col-md-6">
-        <div v-for="stat in list">
+    <div id="places" class="col-md-offset-2 col-md-6">
+        <div v-for="place in place_list">
             <br><br>
-            <button name="station" v-bind:href="http://www.baidu.com" type="button" class="btn btn-primary">
-                {{stat.name}}
-            </button>
+            <a v-bind:href="'./market.html?id=' + place.id">
+                <button type="button" class="btn btn-primary">
+                    {{place.name}}
+                </button>
+            </a>
         </div>
-
     </div>
 </div>
 
-<!--v-on:click="arriveStation(stat.id)"-->
-
 <script>
     $(function () {
-        var station_list
+        var place_list
         $.ajax({
-            url: './cgi/StationController.php',
+            url: web_root+'/cgi/StationController.php',
             methods: 'POST',
             dataType: 'json',
             async: false,
             success: function (data) {
-                station_list = data
+                place_list = data
                 console.log("1")
             }
         })
         console.log("2")
-        var stats = new Vue({
-            el: '#stats',
+        var places = new Vue({
+            el: '#places',
             data: {
-                list: station_list
-            },
-            methods: {
-                arriveStation: function (id) {
-                    console.log("id:"+id)
-                    window.location.href = "./market.html?id="+id
-                }
+                place_list: place_list
             }
         })
         console.log("3")
-
-
-
     })
-
 
 </script>
 

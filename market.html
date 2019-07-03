@@ -5,22 +5,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>黑市</title>
 
-    <link rel="stylesheet" href="./css/bootstrap.css">
-    <script type="text/javascript" src="config.js"></script>
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/bootstrap.js"></script>
     <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <style>
+        .border {
+            border-right: 1px solid #0f0f0f;
+        }
 
-    <title>黑市</title>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+
 </head>
 <body>
-<div class="container-fluid">
-    <div class="col-md-offset-2 col-md-6">
-        A
+
+<div class="container-fluid" id="market">
+    <div class="col-md-offset-2 col-md-4 border" >
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>商品</th>
+                <th>价格￥</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="active" v-for="product in product_list">
+                <td>{{product.name}}</td>
+                <td>{{product.price}}</td>
+                <td>
+                    <button type="button" class="btn btn-info" v-on:click="buy(product.id)">BUY</button>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
     </div>
-    <div class="col-md-offset-2 col-md-6">
-        B
+    <div class="col-md-4" id="mystock">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>商品</th>
+                <th>平均采购价格￥</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="active" v-for="stock in stock_list">
+                <td>{{stock.name}}</td>
+                <td>{{stock.price}}</td>
+                <td>
+                    <button type="button" class="btn btn-info" v-on:click="sell(stock.id)">SELL</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -28,14 +75,34 @@
 
 <script>
 
-    var station = new Vue({
-        el: '#station',
+    new Vue({
+        el: '#market',
+        data: {
+            product_list: [],
+            stock_list: []
+        },
         methods: {
-            jumpToStation: function () {
-                window.location.href = "./station.html"
+            buy: function (id) {
+                console.log("采购商品：" + id)
+            },
+            sell: function (id) {
+                console.log("出售商品：" + id)
             }
+        },
+        created() {
+            var this_ = this;
+            var place_id=GetQueryString("id");
+
+            quest(API.marketProducts, {placeId:place_id}, function (data) {
+                this_.product_list = data
+            });
+            quest(API.mystock, {}, function (data) {
+                this_.stock_list = data
+            });
         }
     })
+
+
 
 
 </script>
