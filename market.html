@@ -10,7 +10,9 @@
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/bootstrap.js"></script>
     <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="js/component.js"></script>
     <script type="text/javascript" src="js/util.js"></script>
+
     <link rel="stylesheet" href="./css/bootstrap.css">
     <style>
         .border {
@@ -26,68 +28,61 @@
 </head>
 <body>
 
-<div class="container-fluid" id="market">
-    <div class="row">
-        <div class="col-md-offset-2 col-md-4 border">
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th>商品</th>
-                    <th>价格￥</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="active" v-for="product in product_list">
-                    <td>{{product.name}}</td>
-                    <td>{{product.price}}</td>
-                    <td>
-                        <button type="button" class="btn btn-info" v-on:click="buy(product.id)">BUY</button>
-                    </td>
-                </tr>
-
-                </tbody>
-            </table>
-
-        </div>
-        <div class="col-md-4" id="mystock">
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th>商品</th>
-                    <th>平均采购价格￥</th>
-                    <th>数量</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="active" v-for="stock in stock_list">
-                    <td>{{stock.name}}</td>
-                    <td>{{stock.price}}</td>
-                    <td>{{stock.quantity}}</td>
-                    <td>
-                        <button type="button" class="btn btn-info" v-on:click="sell(stock.id)">SELL</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+<div id="all">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-4 border">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>商品</th>
+                        <th>价格￥</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="active" v-for="product in product_list">
+                        <td>{{product.name}}</td>
+                        <td>{{product.price}}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" v-on:click="buy(product.id)">BUY</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4" id="mystock">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>商品</th>
+                        <th>平均采购价格￥</th>
+                        <th>数量</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="active" v-for="stock in stock_list">
+                        <td>{{stock.name}}</td>
+                        <td>{{stock.price}}</td>
+                        <td>{{stock.quantity}}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" v-on:click="sell(stock.id)">SELL</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <br><br><br><br>
-    <div class="footer">
-        <iframe src="footer.html" frameborder="0" scrolling="no" style="width: 100%;"></iframe>
-    </div>
-
+    <foot-bar></foot-bar>
 </div>
-
-
 </body>
 
 <script>
-
+    Vue.component('foot-bar', bottomBar)
     new Vue({
-        el: '#market',
+        el: '#all',
         data: {
             product_list: [],
             stock_list: []
@@ -104,7 +99,7 @@
             var this_ = this;
             var place_id = GetQueryString("id");
             quest(API.marketInit, {placeId: place_id}, function (data) {
-                if(data.code==200){
+                if (data.code == 200) {
                     this_.product_list = data.market_products
                     this_.stock_list = data.mystock
                 }
