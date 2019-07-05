@@ -9,8 +9,9 @@
 require_once('config.php');
 
 function query ($sql) {
-    global $DB_IP, $DB_user, $DB_passwd, $DB_name,$DB_port;
-    $mysqli = new mysqli($DB_IP, $DB_user, $DB_passwd, $DB_name,$DB_port);
+    global $mysql_config;//, $DB_user, $DB_passwd, $DB_name,$DB_port;
+    $mysqli = new mysqli($mysql_config['IP'], $mysql_config['user'], $mysql_config['passwd'],
+        $mysql_config['db'], $mysql_config['port']);
 //    printf("B\n");
     if ($mysqli->connect_errno) {
         printf("Connect failed: %s\n", $mysqli->connect_error);
@@ -20,7 +21,7 @@ function query ($sql) {
     /* Select queries return a resultset */
     if ($resultset = $mysqli->query($sql)) {
         while ($row = mysqli_fetch_array($resultset, MYSQLI_ASSOC)) {
-            $result[]=$row;
+            $result[] = $row;
         }
         $resultset->close();
     }

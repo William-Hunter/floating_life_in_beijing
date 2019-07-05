@@ -1,0 +1,2 @@
+{ "_id" : { "$oid" : "5d1ec456674cedb214768331" }, "name" : "鸦片", "base_price" : 100.0, "current_price" : 200.0 }
+{ "_id" : { "$oid" : "5d1ec48e674cedb214768332" }, "name" : "大麻", "base_price" : 100.0, "current_price" : 200.0 }

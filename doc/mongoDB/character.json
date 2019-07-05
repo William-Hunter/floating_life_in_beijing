@@ -1,0 +1,1 @@
+{ "_id" : { "$oid" : "5d1ec240674cedb21476832e" }, "health" : 100.0, "money" : 20000.0, "stock" : 100.0, "debt" : 100.0, "interest" : 0.1 }
