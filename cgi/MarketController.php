@@ -48,14 +48,19 @@ function mystock(){
     return query($sql);
 }
 
+function market_product_mongo($placeId){
+    $place= MongoUtil::queryById("place",$placeId);
+    $id=$place['_id'];
+    MongoUtil::query("product_of_place",);
+}
 
 @$func=$_REQUEST['func'];
 $result=null;
 switch ($func){
     case 'marketInit':
-        $arr1=market_products();
-        $arr2=mystock();
-        $result=array("code"=>200,"msg"=>"success","market_products"=>$arr1,'mystock'=>$arr2);
+        $arr1=market_product_mongo($placeId);
+//        $arr2=mystock_mongo();
+//        $result=array("code"=>200,"msg"=>"success","market_products"=>$arr1,'mystock'=>$arr2);
         break;
     default:break;
 }
