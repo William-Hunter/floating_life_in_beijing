@@ -57,6 +57,7 @@ $result=null;
 switch ($func){
     case 'marketInit':
         $arr1=market_product_mongo($placeId);
+        
 //        $arr2=mystock_mongo();
 //        $result=array("code"=>200,"msg"=>"success","market_products"=>$arr1,'mystock'=>$arr2);
         break;
