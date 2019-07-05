@@ -8,11 +8,10 @@
 
 
 require_once('util/mysql.php');
+require('util/MongoUtil.php');
+header("content-type", "application/json;charset=UTF-8");
 
-function market_products(){
-    header("content-type", "application/json;charset=UTF-8");
-    
-    @$placeId=$_REQUEST['placeId'];
+function market_products($placeId){
     if ($placeId==null){
         echo "null";
         return;
@@ -28,11 +27,9 @@ function market_products(){
         AND pop.place_id = ".$placeId."
 	";
     return query($sql);
-    
 }
 
 function mystock(){
-    header("content-type", "application/json");
     $sql="
         SELECT
             inve.id,
@@ -55,6 +52,7 @@ function market_product_mongo($placeId){
 }
 
 @$func=$_REQUEST['func'];
+@$placeId=$_REQUEST['placeId'];
 $result=null;
 switch ($func){
     case 'marketInit':
