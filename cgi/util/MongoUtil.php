@@ -9,30 +9,23 @@
 require_once('config.php');
 
 class MongoUtil {
-
+    
     /**
      * 通过对象id查找信息
      * @param $ObjectId
      * @return array|null
      */
-    final static public function queryById($collection,$ObjectId) {
+    final static public function queryById ($collection, $ObjectId) {
         $filter = [
-            '_id' => new MongoDB\BSON\ObjectId($ObjectId)
+            '_id' => $ObjectId
         ];
-    
-        $data=MongoUtil::query($collection,$filter);
-        
-        //TODO many work need to be done!
-        
-        if($data[0]!=null){
+        $data = MongoUtil::query($collection, $filter);
+        if ($data[0] != null) {
             return $data[0];
-        }else{
+        } else {
             return;
         }
     }
-    
-    
-    
     
     /**
      * 查询数据，没有参数的话，就是查询所有
@@ -41,30 +34,49 @@ class MongoUtil {
      * @return array|null
      * @throws \MongoDB\Driver\Exception\Exception
      */
-    final static public function query($collection,$filter=[],$queryOptions=null) {
+    final static public function query ($collection, $filter = [], $queryOptions = null) {
         global $mongo_config;
         
-//        $manager=MongoUtil::createConnect();
-        $manager=MongoUtil::connect();
-        
+        $manager = MongoUtil::connect();
+
 //        $queryOptions = [
-            //    'projection' => ['_id' => 0],
-            //    'sort' => ['x' => -1],
+        //    'projection' => ['_id' => 0],
+        //    'sort' => ['x' => -1],
 //        ];
         
         $query = new MongoDB\Driver\Query($filter, $queryOptions);
-        $cursor = $manager->executeQuery($mongo_config['db'] . ".".$collection, $query);
-        $retu=null;
+        $cursor = $manager->executeQuery($mongo_config['db'] . "." . $collection, $query);
+        $retu = null;
         foreach ($cursor as $document) {
             $retu[] = (array)$document;
         }
         return $retu;
     }
     
-    final static private function createConnect() {
+    /**/
+    final static public function command ($command) {
         global $mongo_config;
-        $connStr="mongodb://" . $mongo_config['user'] . ":" . $mongo_config['passwd'] . "@" . $mongo_config['IP'] .":". $mongo_config['port'];
-        return new MongoDB\Driver\Manager($connStr);
+        
+//        echo json_encode($command);
+        try {
+            $manager = MongoUtil::connect();
+            $commandObj = new MongoDB\Driver\Command($command);
+            
+            $cursor = $manager->executeCommand($mongo_config['db'], $commandObj);
+            $data=null;
+            foreach ($cursor as $value) {
+                $data[] = (array)$value;
+//                echo "one";
+            }
+//            echo "1";
+//            echo json_encode($data);
+//            echo "2";
+            return $data;
+        } catch (Exception $e) {
+            //记录错误日志
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+        }
+        return false;
     }
     
     
@@ -75,7 +87,7 @@ class MongoUtil {
     final static private function connect () {
         global $mongo_config;
         try {
-            $connStr = "mongodb://" . $mongo_config['IP'] . ":" . $mongo_config['port'] ;
+            $connStr = "mongodb://" . $mongo_config['IP'] . ":" . $mongo_config['port'];
 //            echo $connStr;
             $options = array(
                 'username' => $mongo_config['user'],
@@ -84,7 +96,7 @@ class MongoUtil {
 //                'connectTimeoutMS' => intval($mongo_config['connect_timeout_ms']),
 //                'socketTimeoutMS' => intval($mongo_config['socket_timeout_ms']),
             );
-            $mc = new MongoDB\Driver\Manager($connStr,$options);
+            $mc = new MongoDB\Driver\Manager($connStr, $options);
             return $mc;
         } catch (Exception $e) {
             return false;

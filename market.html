@@ -64,7 +64,7 @@
                     <tbody>
                     <tr class="active" v-for="stock in stock_list">
                         <td>{{stock.name}}</td>
-                        <td>{{stock.price}}</td>
+                        <td>{{stock.buy_price}}</td>
                         <td>{{stock.quantity}}</td>
                         <td>
                             <button type="button" class="btn btn-info" v-on:click="sell(stock.id)">SELL</button>
