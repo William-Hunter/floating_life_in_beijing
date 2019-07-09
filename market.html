@@ -43,9 +43,9 @@
                     <tbody>
                     <tr class="active" v-for="product in product_list">
                         <td>{{product.name}}</td>
-                        <td>{{product.price}}</td>
+                        <td>{{product.current_price}}</td>
                         <td>
-                            <button type="button" class="btn btn-info" v-on:click="buy(product.id)">BUY</button>
+                            <button type="button" class="btn btn-info" v-on:click="buy(product._id,product.name)">BUY</button>
                         </td>
                     </tr>
                     </tbody>
@@ -67,7 +67,7 @@
                         <td>{{stock.buy_price}}</td>
                         <td>{{stock.quantity}}</td>
                         <td>
-                            <button type="button" class="btn btn-info" v-on:click="sell(stock.id)">SELL</button>
+                            <button type="button" class="btn btn-info" v-on:click="sell(stock._id,stock.name)">SELL</button>
                         </td>
                     </tr>
                     </tbody>
@@ -76,28 +76,84 @@
         </div>
     </div>
     <foot-bar></foot-bar>
+
+    <!-- Modal -->
+    <div class="modal fade" id="buyDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="buyModalLabel">您打算买多少{{dialog_goods_name}}？</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="number" class="form-control" id="buyAmount" placeholder="请输入数量">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
+                    <button type="button" class="btn btn-primary">确认支付</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="sellDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="sellModalLabel">您打算卖出多少{{dialog_goods_name}}？</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="number" class="form-control" id="sellAmount" placeholder="请输入数量">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
+                    <button type="button" class="btn btn-primary">确认出售</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 </body>
 
 <script>
+    function cleanDialog(){
+        $('#buyAmount').val('');
+        $('#sellAmount').val('');
+    }
+
     Vue.component('foot-bar', bottomBar)
     new Vue({
         el: '#all',
         data: {
             product_list: [],
-            stock_list: []
+            stock_list: [],
+            dialog_goods_name:{}
         },
         methods: {
-            buy: function (id) {
-                console.log("采购商品：" + id)
+            buy: function (id,name) {
+                cleanDialog()
+                this.dialog_goods_name=name;
+                $('#buyDialog').modal('show')
+
             },
-            sell: function (id) {
-                console.log("出售商品：" + id)
+            sell: function (id,name) {
+                cleanDialog()
+                this.dialog_goods_name=name;
+                $('#sellDialog').modal('show')
+
             }
         },
         created() {
             var this_ = this;
-            var place_id = GetQueryString("id");
+            var place_id = GetUrlParamter("id");
             quest(API.marketInit, {placeId: place_id}, function (data) {
                 if (data.code == 200) {
                     this_.product_list = data.market_products

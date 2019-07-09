@@ -57,10 +57,16 @@ function mystock_mongo(){
         $stock['name']=$stock_name;
         unset($stock['stock']);
         $results[]=$stock;
-//        echo json_encode($stock);
     }
     return $results;
 }
+
+function sell(){
+
+
+}
+
+
 
 @$func=$_REQUEST['func'];
 @$placeId=$_REQUEST['placeId'];
@@ -79,45 +85,6 @@ if($result!=null){
 }else{
     echo "null";
 }
-
-
-
-/*
- function market_products($placeId){
-    if ($placeId==null){
-        echo "null";
-        return;
-    }
-    $sql="
-        SELECT
-            pro.id,pro.name,pro.current_price AS price
-        FROM
-            product pro,
-            product_of_place pop
-        WHERE
-            pop.product_id = pro.id
-        AND pop.place_id = ".$placeId."
-	";
-    return query($sql);
-}
-
-function mystock(){
-    $sql="
-        SELECT
-            inve.id,
-            pro.`name`,
-            inve.quantity,
-            inve.buy_price AS price
-        FROM
-            inventory inve,
-            product pro
-        WHERE
-            inve.product_id = pro.id
-	";
-    return query($sql);
-}
- */
-
 
 ?>
 

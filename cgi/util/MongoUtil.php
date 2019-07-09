@@ -19,7 +19,10 @@ class MongoUtil {
         $filter = [
             '_id' => $ObjectId
         ];
-        $data = MongoUtil::query($collection, $filter);
+        $options = [
+            'limit' => 1
+        ];
+        $data = MongoUtil::query($collection, $filter,$options);
         if ($data[0] != null) {
             return $data[0];
         } else {
@@ -36,14 +39,7 @@ class MongoUtil {
      */
     final static public function query ($collection, $filter = [], $queryOptions = null) {
         global $mongo_config;
-        
         $manager = MongoUtil::connect();
-
-//        $queryOptions = [
-        //    'projection' => ['_id' => 0],
-        //    'sort' => ['x' => -1],
-//        ];
-        
         $query = new MongoDB\Driver\Query($filter, $queryOptions);
         $cursor = $manager->executeQuery($mongo_config['db'] . "." . $collection, $query);
         $retu = null;
@@ -53,11 +49,9 @@ class MongoUtil {
         return $retu;
     }
     
-    /**/
+    
     final static public function command ($command) {
         global $mongo_config;
-        
-//        echo json_encode($command);
         try {
             $manager = MongoUtil::connect();
             $commandObj = new MongoDB\Driver\Command($command);
@@ -66,11 +60,7 @@ class MongoUtil {
             $data=null;
             foreach ($cursor as $value) {
                 $data[] = (array)$value;
-//                echo "one";
             }
-//            echo "1";
-//            echo json_encode($data);
-//            echo "2";
             return $data;
         } catch (Exception $e) {
             //记录错误日志

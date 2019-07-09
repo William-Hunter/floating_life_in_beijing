@@ -11,7 +11,7 @@ function quest(url, data, func) {
     })
 }
 
-function GetQueryString(name) {
+function GetUrlParamter(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var r = window.location.search.substr(1).match(reg);
     if (r != null) return unescape(r[2]);
@@ -20,5 +20,6 @@ function GetQueryString(name) {
 
 var API = {
     stations:web_root + '/cgi/StationController.php',
-    marketInit: web_root + '/cgi/MarketController.php?func=marketInit'
+    marketInit: web_root + '/cgi/MarketController.php?func=marketInit',
+    mystate:web_root + '/cgi/CharacterController.php?func=mystate'
 }
