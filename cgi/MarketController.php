@@ -12,8 +12,7 @@ require('util/MongoUtil.php');
 header("content-type", "application/json;charset=UTF-8");
 
 
-
-function market_product_mongo($placeId){
+function market_product_mongo ($placeId) {
     $command = [
         'aggregate' => 'place',
         'pipeline' => [
@@ -28,16 +27,16 @@ function market_product_mongo($placeId){
         ],
         'cursor' => (object)[]
     ];
-    $row=MongoUtil::command($command);
-    $products=$row[0]['products'];
-    $market_products=null;
-    foreach($products as $product){
-        $market_products[]=MongoUtil::queryById('product',$product->product_id);
+    $row = MongoUtil::command($command);
+    $products = $row[0]['products'];
+    $market_products = null;
+    foreach ($products as $product) {
+        $market_products[] = MongoUtil::queryById('product', $product->product_id);
     }
     return $market_products;
 }
 
-function mystock_mongo(){
+function mystock_mongo () {
     $command = [
         'aggregate' => 'inventory',
         'pipeline' => [
@@ -50,49 +49,75 @@ function mystock_mongo(){
         ],
         'cursor' => (object)[]
     ];
-    $stocks=MongoUtil::command($command);
-    $results=null;
-    foreach($stocks as $stock){
-        $stock_name=$stock['stock'][0]->name;
-        $stock['name']=$stock_name;
+    $stocks = MongoUtil::command($command);
+    $results = null;
+    foreach ($stocks as $stock) {
+        $stock_name = $stock['stock'][0]->name;
+        $stock['name'] = $stock_name;
         unset($stock['stock']);
-        $results[]=$stock;
+        $results[] = $stock;
     }
     return $results;
 }
 
-function buy($productId,$amount){
-    
-    return array("code"=>200,"msg"=>"success","data"=>null);
+function buy ($productId, $amount) {
+    $product = MongoUtil::queryById('product', $productId);
+//    var_dump($product);
+    $final_per_price = null;
+    $final_aomount = null;
+    $filter = [
+        'product_id' => $product['_id']
+    ];
+    $options = [
+        'limit' => 1
+    ];
+    $rows = MongoUtil::query('inventory', $filter, $options);
+    $count=null;
+    if ($rows <> null) {
+        $inventory = $rows[0];
+        $final_aomount = $amount + $inventory['quantity'];
+        $final_per_price = (($inventory['buy_price'] * $inventory['quantity']) + ($product['current_price'] * $amount))
+            / $final_aomount;
+        $inventory = [
+            '_id' => $inventory['_id'],
+            'product_id' => $inventory['product_id'],
+            'buy_price' => $final_per_price,
+            'quantity' => $final_aomount
+        ];
+        $count=MongoUtil::updateById("inventory", $inventory);
+    } else {
+        $final_per_price = $product['current_price'];
+        $final_aomount = $amount;
+    }
+    return array("code" => 200, "msg" => "success",'count'=>$count);
 }
 
-function sell($productId,$amount){
+function sell ($productId, $amount) {
     
-    return array("code"=>200,"msg"=>"success","data"=>null);
+    return array("code" => 200, "msg" => "success", "data" => null);
 }
 
-@$func=$_REQUEST['func'];
+@$func = $_REQUEST['func'];
 //@$placeId=$_REQUEST['placeId'];
-$result=null;
-switch ($func){
+$result = null;
+switch ($func) {
     case 'marketInit':
-        $arr1=market_product_mongo($_REQUEST['placeId']);
-        $arr2=mystock_mongo();
-        $result=array("code"=>200,"msg"=>"success","market_products"=>$arr1,'mystock'=>$arr2);
+        $arr1 = market_product_mongo($_REQUEST['placeId']);
+        $arr2 = mystock_mongo();
+        $result = array("code" => 200, "msg" => "success", "market_products" => $arr1, 'mystock' => $arr2);
         break;
     case 'buy':
-        buy($_REQUEST['productId'],$_REQUEST['amount']);
+        $result = buy($_REQUEST['productId'], $_REQUEST['amount']);
         break;
     case 'sell':
-        sell($_REQUEST['productId'],$_REQUEST['amount']);
+        $result = sell($_REQUEST['productId'], $_REQUEST['amount']);
         break;
-    default:break;
+    default:
+        break;
 }
 
-if($result!=null){
+if ($result <> null) {
     echo json_encode($result);
-}else{
-    echo "null";
 }
 
 ?>

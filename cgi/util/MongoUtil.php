@@ -10,6 +10,21 @@ require_once('config.php');
 
 class MongoUtil {
     
+    final static public function updateById ($collection, $newObj) {
+        return MongoUtil::update($collection,['_id' => $newObj['_id']],$newObj);
+    }
+    
+    final static public function update ($collection, $filter = [], $newObj = [], array $updateOptions = []) {
+        global $mongo_config;
+        $manager = MongoUtil::connect();
+        $bulk = new MongoDB\Driver\BulkWrite;
+        $newObj = ['$set' => $newObj];
+//        $updateOptions = ['multi' => false, 'upsert' => false];
+        $bulk->update($filter, $newObj, $updateOptions);
+        return $manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
+    }
+    
+    
     /**
      * 通过对象id查找信息
      * @param $ObjectId
@@ -22,8 +37,9 @@ class MongoUtil {
         $options = [
             'limit' => 1
         ];
-        $data = MongoUtil::query($collection, $filter,$options);
-        if ($data[0] != null) {
+        $data = MongoUtil::query($collection, $filter, $options);
+//        var_dump($data);
+        if ($data[0] <> null) {
             return $data[0];
         } else {
             return;
@@ -57,7 +73,7 @@ class MongoUtil {
             $commandObj = new MongoDB\Driver\Command($command);
             
             $cursor = $manager->executeCommand($mongo_config['db'], $commandObj);
-            $data=null;
+            $data = null;
             foreach ($cursor as $value) {
                 $data[] = (array)$value;
             }
@@ -65,8 +81,8 @@ class MongoUtil {
         } catch (Exception $e) {
             //记录错误日志
             echo 'Caught exception: ', $e->getMessage(), "\n";
+            return false;
         }
-        return false;
     }
     
     
@@ -86,9 +102,9 @@ class MongoUtil {
 //                'connectTimeoutMS' => intval($mongo_config['connect_timeout_ms']),
 //                'socketTimeoutMS' => intval($mongo_config['socket_timeout_ms']),
             );
-            $mc = new MongoDB\Driver\Manager($connStr, $options);
-            return $mc;
+            return new MongoDB\Driver\Manager($connStr, $options);
         } catch (Exception $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             return false;
         }
     }
@@ -120,6 +136,8 @@ class MongoUtil {
             return $data;
         } catch (Exception $e) {
             //记录错误日志
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            return false;
         }
         return false;
     }

@@ -22,7 +22,7 @@ switch ($func){
     default:break;
 }
 
-if($result!=null){
+if($result<>null){
     echo json_encode($result);
 }else{
     echo "null";

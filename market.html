@@ -108,7 +108,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
-                    <button type="button" class="btn btn-primary">确认支付</button>
+                    <button type="button" class="btn btn-primary" @click="buy">确认支付</button>
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
-                    <button type="button" class="btn btn-primary">确认出售</button>
+                    <button type="button" class="btn btn-primary" @click="sell">确认出售</button>
                 </div>
             </div>
         </div>
@@ -194,7 +194,7 @@
             sell:function () {
                 quest(API.sell, {
                     productId: this.dialog.goods_id,
-                    amount:this.dialog.sell_amount,
+                    amount:parseInt(this.dialog.sell_amount)
                 }, function (data) {
                     if (data.code == 200) {
 
@@ -204,7 +204,7 @@
             buy:function () {
                 quest(API.buy, {
                     productId: this.dialog.goods_id,
-                    amount:this.dialog.buy_amount,
+                    amount:parseInt(this.dialog.buy_amount)
                 }, function (data) {
                     if (data.code == 200) {
 
