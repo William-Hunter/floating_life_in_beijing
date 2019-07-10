@@ -10,19 +10,57 @@ require_once('config.php');
 
 class MongoUtil {
     
-    final static public function updateById ($collection, $newObj) {
-        return MongoUtil::update($collection,['_id' => $newObj['_id']],$newObj);
+    
+    
+    final static public function generatesId ($collection) {
+        $options = [
+            'limit' => 1,
+            '$project'=>['_id'=>1]
+        ];
+        $data = MongoUtil::query($collection, [], $options);
+        
+        
+        return;
     }
     
-    final static public function update ($collection, $filter = [], $newObj = [], array $updateOptions = []) {
+    /**
+     * 根据id修改，如果不存在就插入
+     * @param $collection
+     * @param $newObj
+     * @return bool
+     */
+    final static public function insertOrUpdateById ($collection, $newObj) {
+        $operater=MongoUtil::insertOrUpdate($collection,['_id' => $newObj['_id']],$newObj);
+        if($operater->getModifiedCount()>0||$operater->getInsertedCount()>0){
+            return true;
+        }else{
+            throw new Exception("插入失败");
+            return false;
+        }
+    }
+    
+    
+    /**
+     * 更新和插入功能
+     * @param $collection
+     * @param array $filter
+     * @param array $newObj
+     * @param array $updateOptions
+     * @return \MongoDB\Driver\WriteResult
+     */
+    final static public function insertOrUpdate ($collection, $filter = [], $newObj = [], array $updateOptions = []) {
         global $mongo_config;
         $manager = MongoUtil::connect();
         $bulk = new MongoDB\Driver\BulkWrite;
         $newObj = ['$set' => $newObj];
-//        $updateOptions = ['multi' => false, 'upsert' => false];
+        $updateOptions = ['multi' => true, 'upsert' => true];
         $bulk->update($filter, $newObj, $updateOptions);
-        return $manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
+        $result=$manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
+        return $result;
     }
+    
+    
+    
     
     
     /**

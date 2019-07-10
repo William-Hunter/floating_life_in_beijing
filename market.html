@@ -153,10 +153,8 @@
 </body>
 
 <script>
-
-
     Vue.component('foot-bar', bottomBar)
-    new Vue({
+    var vue=new Vue({
         el: '#all',
         data: {
             product_list: [],
@@ -171,56 +169,74 @@
             },
         },
         methods: {
+            loaded:function () {
+                var this_=this;
+                quest(API.marketInit, {placeId: GetUrlParamter("id")}, function (data) {
+                    if (data.code == 200) {
+                        this_.product_list = data.market_products
+                        this_.stock_list = data.mystock
+                    }
+                });
+            },
             buy_dialog: function (id, name, price) {
-                this.cleanDialog()
-                this.dialog.goods_id=id;
-                this.dialog.goods_name = name;
-                this.dialog.goods_price = price;
+                var this_=this;
+                this_.cleanDialog()
+                this_.dialog.goods_id=id;
+                this_.dialog.goods_name = name;
+                this_.dialog.goods_price = price;
                 $('#buyDialog').modal('show')
 
             },
             sell_dialog: function (id, name, price, max_sell_amount) {
-                this.cleanDialog()
-                this.dialog.goods_id=id;
-                this.dialog.goods_name = name;
-                this.dialog.goods_price = price;
-                this.dialog.max_sell_amount = max_sell_amount;
+                var this_=this;
+                this_.cleanDialog()
+                this_.dialog.goods_id=id;
+                this_.dialog.goods_name = name;
+                this_.dialog.goods_price = price;
+                this_.dialog.max_sell_amount = max_sell_amount;
                 $('#sellDialog').modal('show')
             },
             cleanDialog: function () {
-                this.dialog.buy_amount = 0;
-                this.dialog.sell_amount = 0;
-            },
-            sell:function () {
-                quest(API.sell, {
-                    productId: this.dialog.goods_id,
-                    amount:parseInt(this.dialog.sell_amount)
-                }, function (data) {
-                    if (data.code == 200) {
-
-                    }
-                });
+                var this_=this;
+                this_.dialog.buy_amount = 0;
+                this_.dialog.sell_amount = 0;
             },
             buy:function () {
+                var this_=this;
+                if(this_.dialog.buy_amount<=0){alert('数量不能为0');return}
                 quest(API.buy, {
-                    productId: this.dialog.goods_id,
-                    amount:parseInt(this.dialog.buy_amount)
+                    productId: this_.dialog.goods_id,
+                    amount:parseInt(this_.dialog.buy_amount)
                 }, function (data) {
                     if (data.code == 200) {
-
+                        alert('购买成功')
+                    }else{
+                        alert(data.msg)
                     }
+                    $('#buyDialog').modal('hide')
+                    this_.loaded()
                 });
-            }
+            },
+            sell:function () {
+                var this_=this;
+                if(this_.dialog.buy_amount<=0){alert('数量不能为0');return}
+                quest(API.sell, {
+                    productId: this_.dialog.goods_id,
+                    amount:parseInt(this_.dialog.sell_amount)
+                }, function (data) {
+                    if (data.code == 200) {
+                        alert('出售成功')
+                    }else{
+                        alert(data.msg)
+                    }
+                    $('#sellDialog').modal('hide')
+                    this_.loaded()
+                });
+            },
         },
         created() {
-            var this_ = this;
-            var place_id = GetUrlParamter("id");
-            quest(API.marketInit, {placeId: place_id}, function (data) {
-                if (data.code == 200) {
-                    this_.product_list = data.market_products
-                    this_.stock_list = data.mystock
-                }
-            });
+            var this_=this;
+            this_.loaded()
         }
     })
 

@@ -60,36 +60,63 @@ function mystock_mongo () {
     return $results;
 }
 
+/**
+ * @param $productId
+ * @param $amount
+ * @return array
+ * @throws \MongoDB\Driver\Exception\Exception
+ */
 function buy ($productId, $amount) {
-    $product = MongoUtil::queryById('product', $productId);
-//    var_dump($product);
-    $final_per_price = null;
-    $final_aomount = null;
-    $filter = [
-        'product_id' => $product['_id']
-    ];
-    $options = [
-        'limit' => 1
-    ];
-    $rows = MongoUtil::query('inventory', $filter, $options);
-    $count=null;
-    if ($rows <> null) {
-        $inventory = $rows[0];
-        $final_aomount = $amount + $inventory['quantity'];
-        $final_per_price = (($inventory['buy_price'] * $inventory['quantity']) + ($product['current_price'] * $amount))
-            / $final_aomount;
-        $inventory = [
-            '_id' => $inventory['_id'],
-            'product_id' => $inventory['product_id'],
-            'buy_price' => $final_per_price,
-            'quantity' => $final_aomount
-        ];
-        $count=MongoUtil::updateById("inventory", $inventory);
-    } else {
-        $final_per_price = $product['current_price'];
-        $final_aomount = $amount;
+    try{
+        $product = MongoUtil::queryById('product', $productId);
+        $final_per_price = null;
+        $final_aomount = null;
+        $final_spend=null;
+        $filter = ['product_id' => $product['_id']];
+        $options = ['limit' => 1];
+        $rows = MongoUtil::query('inventory', $filter, $options);
+        $inventory=null;
+        if ($rows <> null) {
+            $inventory = $rows[0];
+            $final_aomount = $amount + $inventory['quantity'];
+            $final_spend=($inventory['buy_price']* $inventory['quantity']) + ($product['current_price'] * $amount);
+            $final_per_price = $final_spend/ $final_aomount;
+            $inventory = [
+                '_id' => $inventory['_id'],
+                'product_id' => $inventory['product_id'],
+                'buy_price' => round($final_per_price,2),
+                'quantity' => $final_aomount
+            ];
+        } else {
+            $final_per_price = $product['current_price'];
+            $final_aomount = $amount;
+            $final_spend=$product['current_price']*$amount;
+            $inventory = [
+                '_id' => '2222',
+                'product_id' => $productId,
+                'buy_price' => round($final_per_price,2),
+                'quantity' => $final_aomount
+            ];
+        }
+        echo random_int(1,9999999);
+        $character=$data = MongoUtil::query("character", [], ['limit' => 1])[0];
+//        var_dump($character);
+//        var_dump($final_spend);
+        
+        if($character['money'] >= $final_spend){
+            $character_money=$character['money']-$final_spend;
+            $character['money']=round($character_money,2);
+            $re_bol=MongoUtil::insertOrUpdateById("character", $character);
+            $re_bol=MongoUtil::insertOrUpdateById("inventory", $inventory);
+            if($re_bol){
+                return array("code" => 200, "msg" => "success");
+            }
+        }else{
+            throw new Exception("金钱不足");
+        }
+    }catch (Exception $e){
+        return array("code" => 500, "msg" =>$e->getMessage());
     }
-    return array("code" => 200, "msg" => "success",'count'=>$count);
 }
 
 function sell ($productId, $amount) {
