@@ -73,7 +73,7 @@ var bottomBar = Vue.extend({
         quest(API.mystate, {}, function (data) {
             if (data.code == 200) {
                 this_.state=data.state
-                console.log(this_.state)
+                // console.log(this_.state)
             }
         });
     }

@@ -45,7 +45,9 @@
                         <td>{{product.name}}</td>
                         <td>{{product.current_price}}</td>
                         <td>
-                            <button type="button" class="btn btn-info" v-on:click="buy(product._id,product.name)">BUY</button>
+                            <button type="button" class="btn btn-info"
+                                    v-on:click="buy_dialog(product._id,product.name,product.current_price)">BUY
+                            </button>
                         </td>
                     </tr>
                     </tbody>
@@ -67,7 +69,9 @@
                         <td>{{stock.buy_price}}</td>
                         <td>{{stock.quantity}}</td>
                         <td>
-                            <button type="button" class="btn btn-info" v-on:click="sell(stock._id,stock.name)">SELL</button>
+                            <button type="button" class="btn btn-info"
+                                    v-on:click="sell_dialog(stock._id,stock.name,stock.buy_price,stock.quantity)">SELL
+                            </button>
                         </td>
                     </tr>
                     </tbody>
@@ -85,10 +89,22 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="buyModalLabel">您打算买多少{{dialog_goods_name}}？</h4>
+                    <h4 class="modal-title" id="buyModalLabel">您打算买多少{{dialog.goods_name}}？</h4>
                 </div>
                 <div class="modal-body">
-                    <input type="number" class="form-control" id="buyAmount" placeholder="请输入数量">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="number" class="form-control" id="buyAmount" placeholder="请输入数量" min="0"
+                                   step="1" v-model="dialog.buy_amount">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
+                                <input type="number" class="form-control" id="buyPrice" value="0" min="0" step="1"
+                                       v-bind:value="dialog.buy_amount*dialog.goods_price" readonly>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
@@ -107,10 +123,23 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="sellModalLabel">您打算卖出多少{{dialog_goods_name}}？</h4>
+                    <h4 class="modal-title" id="sellModalLabel">您打算卖出多少{{dialog.goods_name}}？</h4>
                 </div>
                 <div class="modal-body">
-                    <input type="number" class="form-control" id="sellAmount" placeholder="请输入数量">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="number" class="form-control" id="sellAmount" placeholder="请输入数量"
+                                   v-bind:max="dialog.max_sell_amount" min="0"
+                                   step="1" v-model="dialog.sell_amount">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
+                                <input type="number" class="form-control" id="sellPrice" value="0" min="0" step="1"
+                                       v-bind:value="dialog.sell_amount*dialog.goods_price" readonly>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
@@ -124,10 +153,7 @@
 </body>
 
 <script>
-    function cleanDialog(){
-        $('#buyAmount').val('');
-        $('#sellAmount').val('');
-    }
+
 
     Vue.component('foot-bar', bottomBar)
     new Vue({
@@ -135,20 +161,55 @@
         data: {
             product_list: [],
             stock_list: [],
-            dialog_goods_name:{}
+            dialog:{
+                goods_id:'',
+                goods_name:'',
+                goods_price:0,
+                buy_amount:0,
+                sell_amount:0,
+                max_sell_amount:99999
+            },
         },
         methods: {
-            buy: function (id,name) {
-                cleanDialog()
-                this.dialog_goods_name=name;
+            buy_dialog: function (id, name, price) {
+                this.cleanDialog()
+                this.dialog.goods_id=id;
+                this.dialog.goods_name = name;
+                this.dialog.goods_price = price;
                 $('#buyDialog').modal('show')
 
             },
-            sell: function (id,name) {
-                cleanDialog()
-                this.dialog_goods_name=name;
+            sell_dialog: function (id, name, price, max_sell_amount) {
+                this.cleanDialog()
+                this.dialog.goods_id=id;
+                this.dialog.goods_name = name;
+                this.dialog.goods_price = price;
+                this.dialog.max_sell_amount = max_sell_amount;
                 $('#sellDialog').modal('show')
+            },
+            cleanDialog: function () {
+                this.dialog.buy_amount = 0;
+                this.dialog.sell_amount = 0;
+            },
+            sell:function () {
+                quest(API.sell, {
+                    productId: this.dialog.goods_id,
+                    amount:this.dialog.sell_amount,
+                }, function (data) {
+                    if (data.code == 200) {
 
+                    }
+                });
+            },
+            buy:function () {
+                quest(API.buy, {
+                    productId: this.dialog.goods_id,
+                    amount:this.dialog.buy_amount,
+                }, function (data) {
+                    if (data.code == 200) {
+
+                    }
+                });
             }
         },
         created() {

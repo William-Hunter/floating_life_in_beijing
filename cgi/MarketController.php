@@ -61,21 +61,30 @@ function mystock_mongo(){
     return $results;
 }
 
-function sell(){
-
-
+function buy($productId,$amount){
+    
+    return array("code"=>200,"msg"=>"success","data"=>null);
 }
 
-
+function sell($productId,$amount){
+    
+    return array("code"=>200,"msg"=>"success","data"=>null);
+}
 
 @$func=$_REQUEST['func'];
-@$placeId=$_REQUEST['placeId'];
+//@$placeId=$_REQUEST['placeId'];
 $result=null;
 switch ($func){
     case 'marketInit':
-        $arr1=market_product_mongo($placeId);
+        $arr1=market_product_mongo($_REQUEST['placeId']);
         $arr2=mystock_mongo();
         $result=array("code"=>200,"msg"=>"success","market_products"=>$arr1,'mystock'=>$arr2);
+        break;
+    case 'buy':
+        buy($_REQUEST['productId'],$_REQUEST['amount']);
+        break;
+    case 'sell':
+        sell($_REQUEST['productId'],$_REQUEST['amount']);
         break;
     default:break;
 }
