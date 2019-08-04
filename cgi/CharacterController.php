@@ -8,10 +8,29 @@
 
 require('util/MongoUtil.php');
 
-function mystate(){
-    return MongoUtil::query("character",[],['limit' => 1])[0];
+function myStockAmount(){
+    $command = [
+        'aggregate' => 'inventory',
+        'pipeline' => [
+            [
+                '$group' => [
+                    "_id" => [],
+                    "total" => [
+                        '$sum' => '$quantity'
+                    ]
+                ]
+            ]
+        ],
+        'cursor' => (object)[]
+    ];
+    return  MongoUtil::command($command)[0]['total'];
 }
 
+function mystate(){
+    $state=MongoUtil::query("character",[],['limit' => 1])[0];
+    $state['stocked']=myStockAmount();
+    return $state;
+}
 
 @$func=$_REQUEST['func'];
 $result=null;

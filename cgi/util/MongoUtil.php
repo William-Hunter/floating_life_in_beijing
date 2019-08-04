@@ -6,21 +6,45 @@
  * Time: 16:49
  */
 
+use MongoDB\Driver\BulkWrite;
+
 require_once('config.php');
 
 class MongoUtil {
-    
-    
-    
+
     final static public function generatesId ($collection) {
         $options = [
             'limit' => 1,
             '$project'=>['_id'=>1]
         ];
         $data = MongoUtil::query($collection, [], $options);
-        
-        
         return;
+    }
+
+    /**
+     * 根据id删除记录
+     * @param $collection   表名
+     * @param $id     记录id
+     * @return array|bool
+     */
+    final static public function deleteById($collection,$id){
+        try{
+            global $mongo_config;
+            $manager = MongoUtil::connect();
+            $bulk = new MongoDB\Driver\BulkWrite;
+            $filter = ['_id' => $id];
+            $Options = ['limit' => 0];
+            $bulk->delete($filter, $Options);
+            $result=$manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
+            if($result->getDeletedCount()>0){
+                return true;
+            }else{
+                throw new Exception("删除失败");
+                return false;
+            }
+        }catch (Exception $e){
+            return array("code" => 500, "msg" =>$e->getMessage());
+        }
     }
     
     /**
@@ -30,12 +54,16 @@ class MongoUtil {
      * @return bool
      */
     final static public function insertOrUpdateById ($collection, $newObj) {
-        $operater=MongoUtil::insertOrUpdate($collection,['_id' => $newObj['_id']],$newObj);
-        if($operater->getModifiedCount()>0||$operater->getInsertedCount()>0){
-            return true;
-        }else{
-            throw new Exception("插入失败");
-            return false;
+        try{
+            $operater=MongoUtil::insertOrUpdate($collection,['_id' => $newObj['_id']],$newObj);
+            if($operater->getModifiedCount()>0||$operater->getInsertedCount()>0){
+                return true;
+            }else{
+                throw new Exception("插入失败");
+                return false;
+            }
+        }catch (Exception $e){
+            return array("code" => 500, "msg" =>$e->getMessage());
         }
     }
     
@@ -76,7 +104,6 @@ class MongoUtil {
             'limit' => 1
         ];
         $data = MongoUtil::query($collection, $filter, $options);
-//        var_dump($data);
         if ($data[0] <> null) {
             return $data[0];
         } else {
