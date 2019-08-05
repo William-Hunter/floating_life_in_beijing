@@ -9,13 +9,11 @@
 
 require_once('util/mysql.php');
 require('util/MongoUtil.php');
+require('util/Calc.php');
 header("content-type", "application/json;charset=UTF-8");
 
 
-function market_product_mongo($placeId,$arrived) {
-    if($arrived<>null){
-
-    }
+function market_product_mongo($placeId) {
     $command = [
         'aggregate' => 'place',
         'pipeline' => [
@@ -54,6 +52,7 @@ function mystock_mongo() {
     ];
     $stocks = MongoUtil::command($command);
     $results = null;
+    if($stocks==null)return $results;
     foreach ($stocks as $stock) {
         $stock_name = $stock['stock'][0]->name;
         $stock['name'] = $stock_name;
@@ -73,7 +72,7 @@ function buy($productId, $amount) {
     try {
         $product = MongoUtil::queryById('product', $productId);
         $new_price = null;                                  //新均价
-        $final_aomount = null;                              //总数量
+        $final_amount = null;                              //总数量
         $buy_spend = ($product['current_price'] * $amount);  //采购花费
         $final_spend = null;                                  //总花费
         $filter = ['product_id' => $product['_id']];
@@ -82,14 +81,14 @@ function buy($productId, $amount) {
         $inventory = null;
         if ($rows <> null) {
             $inventory = $rows[0];
-            $final_aomount = $amount + $inventory['quantity'];
+            $final_amount = $amount + $inventory['quantity'];
             $final_spend = ($inventory['buy_price'] * $inventory['quantity']) + $buy_spend;
-            $new_price = $final_spend / $final_aomount;
+            $new_price = $final_spend / $final_amount;
             $inventory = [
                 '_id' => $inventory['_id'],
                 'product_id' => $inventory['product_id'],
                 'buy_price' => round($new_price, 2),
-                'quantity' => $final_aomount
+                'quantity' => $final_amount
             ];
         } else {
             $inventory = [
@@ -100,16 +99,19 @@ function buy($productId, $amount) {
             ];
         }
         $character = $data = MongoUtil::query("character", [], ['limit' => 1])[0];
-        if ($character['money'] >= $buy_spend) {
+        if ($character['money'] < $buy_spend) {
+            throw new Exception("金钱不足");
+        } elseif ($character['stock']<(Calc::myStockAmount()+$amount)){
+            throw new Exception("空间不足");
+        }else {
             $character_money = $character['money'] - $buy_spend;
             $character['money'] = round($character_money, 2);
             $re_bol = MongoUtil::insertOrUpdateById("character", $character);
             $re_bol = MongoUtil::insertOrUpdateById("inventory", $inventory);
+            Calc::evilRise($buy_spend);
             if ($re_bol) {
                 return array("code" => 200, "msg" => "success");
             }
-        } else {
-            throw new Exception("金钱不足");
         }
     } catch (Exception $e) {
         return array("code" => 500, "msg" => $e->getMessage());
@@ -130,6 +132,7 @@ function sell($goodsId, $amount) {
         $character_money = $character['money'] + $earn_money;
         $character['money'] = round($character_money, 2);
         $re_bol = MongoUtil::insertOrUpdateById("character", $character);
+        Calc::evilRise($earn_money);
         //TODO 核算剩余库存
         $quantity = $inventory['quantity'];
         $inventory['quantity'] = $quantity - $amount;
@@ -142,12 +145,49 @@ function sell($goodsId, $amount) {
     return array("code" => 200, "msg" => "success");
 }
 
+
+function afterDay($placeId){
+    //日子过去一天了，债务也在涨
+    $state=MongoUtil::query("character",[],['limit' => 1])[0];
+    $new_day=$state['date']+1;
+    $state['date']=(int)$new_day;
+    $debt=($state['interest']+1)*$state['debt'];
+    $state['debt']=round($debt,2);
+    MongoUtil::insertOrUpdateById('character',$state);
+
+    //价格波动
+    $product_list = MongoUtil::query("product", [], null);
+    foreach ($product_list as $product){
+        $new_price=$product['base_price']*(random_int(1,19)/10.0);
+        $product['current_price']=round($new_price,2);
+        MongoUtil::insertOrUpdateById('product',$product);
+    }
+//  地区商品波动
+    MongoUtil::delete('product_of_place',['place_id'=>$placeId]);
+    $place=MongoUtil::queryById('place',$placeId);
+    $products=MongoUtil::query('product');
+    $remove_index=random_int(-1,count($products));
+    array_splice($products,$remove_index,1);
+    foreach ($products as $product){
+        MongoUtil::insert('product_of_place',[
+            '_id'=>strval(random_int(1, 9999999)),
+            'product_id'=>$product['_id'],
+            'place_id'=> $place['_id']
+        ]);
+    }
+    return array("code" => 200, "msg" => "success");
+}
+
+
 @$func = $_REQUEST['func'];
 //@$placeId=$_REQUEST['placeId'];
 $result = null;
 switch ($func) {
     case 'marketInit':
-        $arr1 = market_product_mongo($_REQUEST['placeId'],$_REQUEST['arrived']);
+        $result =afterDay($_REQUEST['placeId']);
+        break;
+    case 'marketInfo':
+        $arr1 = market_product_mongo($_REQUEST['placeId']);
         $arr2 = mystock_mongo();
         $result = array("code" => 200, "msg" => "success", "market_products" => $arr1, 'mystock' => $arr2);
         break;

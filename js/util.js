@@ -21,6 +21,7 @@ function GetUrlParamter(name) {
 var API = {
     stations:web_root + '/cgi/StationController.php',
     marketInit: web_root + '/cgi/MarketController.php?func=marketInit',
+    marketInfo: web_root + '/cgi/MarketController.php?func=marketInfo',
     mystate:web_root + '/cgi/CharacterController.php?func=mystate',
     buy:web_root + '/cgi/MarketController.php?func=buy',
     sell:web_root + '/cgi/MarketController.php?func=sell',

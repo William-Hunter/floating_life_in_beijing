@@ -170,13 +170,12 @@
         methods: {
             reload:function(){
                 var this_=this;
-                this.loaded();
+                this_.loaded();
                 vue.$refs.bottomBar.Load();
             },
-            loaded:function (arrived) {
+            loaded:function () {
                 var this_=this;
-                if(!arrived)arrived='';
-                quest(API.marketInit+arrived, {placeId: GetUrlParamter("id")}, function (data) {
+                quest(API.marketInfo, {placeId: GetUrlParamter("id")}, function (data) {
                     if (data.code == 200) {
                         this_.product_list = data.market_products
                         this_.stock_list = data.mystock
@@ -222,6 +221,11 @@
                     alert("你没有那么多钱");
                     return;
                 }
+                if((parseInt(this_.dialog.amount)+vue.$refs.bottomBar.state.stocked)
+                    >vue.$refs.bottomBar.state.stock){
+                    alert("仓库放不下那么多东西");
+                    return;
+                }
                 quest(API.buy, {
                     productId: this_.dialog.goods_id,
                     amount:parseInt(this_.dialog.amount)
@@ -260,7 +264,11 @@
         },
         created() {
             var this_=this;
-            this_.loaded('&arrived=true')
+            quest(API.marketInit, {
+                placeId: GetUrlParamter("id")
+            }, function (data) {
+            });
+            this_.loaded()
         }
     })
 </script>

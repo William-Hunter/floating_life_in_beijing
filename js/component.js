@@ -26,18 +26,19 @@ var bottomBar = Vue.extend({
                         健康 <span class="badge">{{state.health}}%</span>
                     </div>
                     <div class="row">
-                        资金 <span class="badge">{{state.money}}</span>
+                        资金 <span class="badge">{{state.money}}￥</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-3">
-                    罪恶 <span class="badge">{{state.crime}}</span>
+                <div class="row">罪恶<span class="badge">{{state.crime}}</span></div>
+                <div class="row">时间<span class="badge">{{state.date}}/40</span></div>
                 </div>
                 <div class="col-md-3 col-sm-3">
                     <div class="row">
                         仓储 <span class="badge">{{state.stocked}}/{{state.stock}}</span>
                     </div>
                     <div class="row">
-                        负债 <span class="badge">{{state.debt}}</span>
+                        负债 <span class="badge">{{state.debt}}￥</span>
                     </div>
                 </div>
             </div>

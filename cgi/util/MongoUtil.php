@@ -7,11 +7,9 @@
  */
 
 use MongoDB\Driver\BulkWrite;
-
 require_once('config.php');
 
 class MongoUtil {
-
     final static public function generatesId ($collection) {
         $options = [
             'limit' => 1,
@@ -19,6 +17,30 @@ class MongoUtil {
         ];
         $data = MongoUtil::query($collection, [], $options);
         return;
+    }
+
+    /**
+     * 根据条件删除
+     * @param $collection   表明
+     * @param $condition  删除条件
+     */
+    final static public function delete($collection,$condition=[]){
+        try{
+            global $mongo_config;
+            $manager = MongoUtil::connect();
+            $bulk = new MongoDB\Driver\BulkWrite;
+            $Options = ['limit' => 0];
+            $bulk->delete($condition, $Options);
+            $result=$manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
+            if($result->getDeletedCount()>0){
+                return true;
+            }else{
+                throw new Exception("删除失败");
+                return false;
+            }
+        }catch (Exception $e){
+            return array("code" => 500, "msg" =>$e->getMessage());
+        }
     }
 
     /**
@@ -66,8 +88,7 @@ class MongoUtil {
             return array("code" => 500, "msg" =>$e->getMessage());
         }
     }
-    
-    
+
     /**
      * 更新和插入功能
      * @param $collection
@@ -76,20 +97,25 @@ class MongoUtil {
      * @param array $updateOptions
      * @return \MongoDB\Driver\WriteResult
      */
-    final static public function insertOrUpdate ($collection, $filter = [], $newObj = [], array $updateOptions = []) {
+    final static public function insertOrUpdate ($collection, $filter = [], $newObj = [],$updateOptions = []) {
         global $mongo_config;
         $manager = MongoUtil::connect();
         $bulk = new MongoDB\Driver\BulkWrite;
-        $newObj = ['$set' => $newObj];
+        $obj = ['$set' => $newObj];
         $updateOptions = ['multi' => true, 'upsert' => true];
-        $bulk->update($filter, $newObj, $updateOptions);
+        $bulk->update($filter, $obj, $updateOptions);
         $result=$manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
         return $result;
     }
-    
-    
-    
-    
+
+    final static public function insert ($collection,  $newObj = []) {
+        global $mongo_config;
+        $manager = MongoUtil::connect();
+        $bulk = new MongoDB\Driver\BulkWrite;
+        $bulk->insert($newObj);
+        $result=$manager->executeBulkWrite($mongo_config['db'] . "." . $collection, $bulk);
+        return $result;
+    }
     
     /**
      * 通过对象id查找信息
@@ -97,12 +123,8 @@ class MongoUtil {
      * @return array|null
      */
     final static public function queryById ($collection, $ObjectId) {
-        $filter = [
-            '_id' => $ObjectId
-        ];
-        $options = [
-            'limit' => 1
-        ];
+        $filter = [ '_id' => $ObjectId ];
+        $options = [ 'limit' => 1 ];
         $data = MongoUtil::query($collection, $filter, $options);
         if ($data[0] <> null) {
             return $data[0];
@@ -129,14 +151,12 @@ class MongoUtil {
         }
         return $retu;
     }
-    
-    
+
     final static public function command ($command) {
         global $mongo_config;
         try {
             $manager = MongoUtil::connect();
             $commandObj = new MongoDB\Driver\Command($command);
-            
             $cursor = $manager->executeCommand($mongo_config['db'], $commandObj);
             $data = null;
             foreach ($cursor as $value) {
@@ -144,13 +164,11 @@ class MongoUtil {
             }
             return $data;
         } catch (Exception $e) {
-            //记录错误日志
             echo 'Caught exception: ', $e->getMessage(), "\n";
             return false;
         }
     }
-    
-    
+
     /**
      * 创建链接
      * @return bool|\MongoDB\Driver\Manager
@@ -159,53 +177,20 @@ class MongoUtil {
         global $mongo_config;
         try {
             $connStr = "mongodb://" . $mongo_config['IP'] . ":" . $mongo_config['port'];
-//            echo $connStr;
-            $options = array(
+            $options = [
                 'username' => $mongo_config['user'],
                 'password' => $mongo_config['passwd'],
                 'readPreference' => $mongo_config['read_preference']
 //                'connectTimeoutMS' => intval($mongo_config['connect_timeout_ms']),
 //                'socketTimeoutMS' => intval($mongo_config['socket_timeout_ms']),
-            );
+            ];
             return new MongoDB\Driver\Manager($connStr, $options);
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
             return false;
         }
     }
-    
-    final static public function find ($query = array(), $fields = array(), $collection, $sort = array(), $limit = 0, $skip = 0) {
-        $conn = MongoUtil::connect();
-        if (empty($conn)) {
-            return false;
-        }
-        try {
-            $data = array();
-            $options = array();
-            if (!empty($query)) {
-                $options['projection'] = array_fill_keys($fields, 1);
-            }
-            if (!empty($sort)) {
-                $options['sort'] = $sort;
-            }
-            if (!empty($limit)) {
-                $options['skip'] = $skip;
-                $options['limit'] = $limit;
-            }
-            $mongoQuery = new MongoDB\Driver\Query($query, $options);
-            $readPreference = new MongoDB\Driver\ReadPreference(MongoDB\Driver\ReadPreference::RP_SECONDARY);
-            $cursor = $conn->executeQuery($collection, $mongoQuery, $readPreference);
-            foreach ($cursor as $value) {
-                $data[] = (array)$value;
-            }
-            return $data;
-        } catch (Exception $e) {
-            //记录错误日志
-            echo 'Caught exception: ', $e->getMessage(), "\n";
-            return false;
-        }
-        return false;
-    }
+
 }
 
 ?>
