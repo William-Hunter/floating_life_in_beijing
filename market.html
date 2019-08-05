@@ -70,7 +70,7 @@
                         <td>{{stock.quantity}}</td>
                         <td>
                             <button type="button" class="btn btn-info"
-                                    v-on:click="sell_dialog(stock._id,stock.name,stock.buy_price,stock.quantity)">SELL
+                                    v-on:click="sell_dialog(stock)">SELL
                             </button>
                         </td>
                     </tr>
@@ -95,13 +95,13 @@
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
                             <input type="number" class="form-control" id="buyAmount" placeholder="请输入数量" min="0"
-                                   step="1" v-model="dialog.buy_amount">
+                                   step="1" v-model="dialog.amount">
                         </div>
                         <div class="col-md-6 col-sm-6">
                             <div class="input-group">
                                 <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
                                 <input type="number" class="form-control" id="buyPrice" value="0" min="0" step="1"
-                                       v-bind:value="dialog.buy_amount*dialog.goods_price" readonly>
+                                       v-bind:value="dialog.amount*dialog.goods_price" readonly>
                             </div>
                         </div>
                     </div>
@@ -113,7 +113,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Modal -->
     <div class="modal fade" id="sellDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -130,13 +129,13 @@
                         <div class="col-md-6 col-sm-6">
                             <input type="number" class="form-control" id="sellAmount" placeholder="请输入数量"
                                    v-bind:max="dialog.max_sell_amount" min="0"
-                                   step="1" v-model="dialog.sell_amount">
+                                   step="1" v-model="dialog.amount">
                         </div>
                         <div class="col-md-6 col-sm-6">
                             <div class="input-group">
                                 <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
                                 <input type="number" class="form-control" id="sellPrice" value="0" min="0" step="1"
-                                       v-bind:value="dialog.sell_amount*dialog.goods_price" readonly>
+                                       v-bind:value="dialog.amount*dialog.sell_price" readonly>
                             </div>
                         </div>
                     </div>
@@ -148,7 +147,6 @@
             </div>
         </div>
     </div>
-
 </div>
 </body>
 
@@ -163,8 +161,9 @@
                 goods_id:'',
                 goods_name:'',
                 goods_price:0,
-                buy_amount:0,
-                sell_amount:0,
+                amount:0,
+                sell_price:0,
+                sell_product_id:'',
                 max_sell_amount:99999
             },
         },
@@ -174,9 +173,10 @@
                 this.loaded();
                 vue.$refs.bottomBar.Load();
             },
-            loaded:function () {
+            loaded:function (arrived) {
                 var this_=this;
-                quest(API.marketInit, {placeId: GetUrlParamter("id")}, function (data) {
+                if(!arrived)arrived='';
+                quest(API.marketInit+arrived, {placeId: GetUrlParamter("id")}, function (data) {
                     if (data.code == 200) {
                         this_.product_list = data.market_products
                         this_.stock_list = data.mystock
@@ -190,28 +190,41 @@
                 this_.dialog.goods_name = name;
                 this_.dialog.goods_price = price;
                 $('#buyDialog').modal('show')
-
             },
-            sell_dialog: function (id, name, price, max_sell_amount) {
+            sell_dialog: function (stock) {
                 var this_=this;
                 this_.cleanDialog()
-                this_.dialog.goods_id=id;
-                this_.dialog.goods_name = name;
-                this_.dialog.goods_price = price;
-                this_.dialog.max_sell_amount = max_sell_amount;
+                this_.dialog.goods_id=stock._id;
+                this_.dialog.goods_name = stock.name;
+                this_.dialog.max_sell_amount = stock.quantity;
+                this_.dialog.sell_product_id=stock.product_id;
+                this_.product_list.forEach(function (product) {
+                    if(product._id==stock.product_id){
+                        this_.dialog.sell_price = product.current_price;
+                        console.log(this_.dialog.sell_price)
+                    }
+                })
                 $('#sellDialog').modal('show')
             },
             cleanDialog: function () {
                 var this_=this;
-                this_.dialog.buy_amount = 0;
-                this_.dialog.sell_amount = 0;
+                this_.dialog.goods_id='';
+                this_.dialog.goods_name = '';
+                this_.dialog.max_sell_amount = 0;
+                this_.dialog.amount = 0;
+                this_.dialog.sell_price=0;
+                this_.dialog.sell_product_id='';
             },
             buy:function () {
                 var this_=this;
-                if(this_.dialog.buy_amount<=0){alert('数量不能为0');return}
+                if(this_.dialog.amount<=0){alert('数量不能为0');return}
+                if(this_.dialog.amount*this_.dialog.goods_price>vue.$refs.bottomBar.state.money){
+                    alert("你没有那么多钱");
+                    return;
+                }
                 quest(API.buy, {
                     productId: this_.dialog.goods_id,
-                    amount:parseInt(this_.dialog.buy_amount)
+                    amount:parseInt(this_.dialog.amount)
                 }, function (data) {
                     if (data.code == 200) {
                         alert('购买成功')
@@ -224,10 +237,15 @@
             },
             sell:function () {
                 var this_=this;
-                if(this_.dialog.sell_amount<=0){alert('数量不能为0');return}
+                var sellable=false;
+                this_.product_list.forEach(function (product) {
+                    if(product._id==this_.dialog.sell_product_id)sellable=true;
+                })
+                if(!sellable){alert('此处不收购此种商品');return}
+                if(this_.dialog.amount<=0){alert('出售数量不能为0');return}
                 quest(API.sell, {
                     goodsId: this_.dialog.goods_id,
-                    amount:parseInt(this_.dialog.sell_amount)
+                    amount:parseInt(this_.dialog.amount)
                 }, function (data) {
                     if (data.code == 200) {
                         alert('出售成功')
@@ -242,11 +260,9 @@
         },
         created() {
             var this_=this;
-            this_.loaded()
+            this_.loaded('&arrived=true')
         }
     })
-
-
 </script>
 
 </html>

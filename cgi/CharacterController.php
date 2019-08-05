@@ -47,8 +47,5 @@ if($result<>null){
     echo "null";
 }
 
-
-
-
 ?>
 

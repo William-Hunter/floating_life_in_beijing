@@ -12,7 +12,10 @@ require('util/MongoUtil.php');
 header("content-type", "application/json;charset=UTF-8");
 
 
-function market_product_mongo($placeId) {
+function market_product_mongo($placeId,$arrived) {
+    if($arrived<>null){
+
+    }
     $command = [
         'aggregate' => 'place',
         'pipeline' => [
@@ -96,7 +99,6 @@ function buy($productId, $amount) {
                 'quantity' => (int)$amount
             ];
         }
-
         $character = $data = MongoUtil::query("character", [], ['limit' => 1])[0];
         if ($character['money'] >= $buy_spend) {
             $character_money = $character['money'] - $buy_spend;
@@ -145,7 +147,7 @@ function sell($goodsId, $amount) {
 $result = null;
 switch ($func) {
     case 'marketInit':
-        $arr1 = market_product_mongo($_REQUEST['placeId']);
+        $arr1 = market_product_mongo($_REQUEST['placeId'],$_REQUEST['arrived']);
         $arr2 = mystock_mongo();
         $result = array("code" => 200, "msg" => "success", "market_products" => $arr1, 'mystock' => $arr2);
         break;
