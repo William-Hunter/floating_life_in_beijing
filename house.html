@@ -14,23 +14,94 @@
     <script type="text/javascript" src="js/util.js"></script>
 
     <link rel="stylesheet" href="./css/bootstrap.css">
+    <style>
+        .jumbotron {
+            background-image: url("img/house_saler.jpg");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+    </style>
 </head>
 <div id="all">
-    <div class="container-fluid">
-        <h1>人人都有一个家</h1>
-
+    <div class="jumbotron">
+        <div class="container">
+            <div class="col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9">
+                <div class="row">
+                    <h1>万达售楼部</h1>
+                    <p style="color:#F5BD00;"><strong>
+                        “呦，您可不知道，现在的城市里都是人，不盖点摩天大厦，怎么能安置那么多人？”
+                    </strong></p>
+                </div>
+                <div class="row">
+                    <p>
+                    <div class="col-md-3 col-sm-3" v-for="house in house_list">
+                        <a href="#" class="btn btn-primary btn-lg" role="button"
+                           v-on:click="house_dialog(house)">{{house.name}}
+                        </a>
+                    </div>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
     <foot-bar></foot-bar>
+
+    <!-- 买房窗口 Modal -->
+    <div class="modal fade" id="houseDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="ModalLabel">{{dialog.house.name}}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您确定要买这个房子？,这将花费您{{dialog.house.price}}￥，给您带来{{dialog.house.stock}}空间</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
+                    <button type="button" class="btn btn-primary" @click="buyHouse(dialog.house._id)">确认购买</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
 
 </body>
 <script>
     Vue.component('foot-bar', bottomBar)
     new Vue({
-        el: '#all',data:{}
-    });
+        el: '#all',
+        data: {
+            house_list: [],
+            dialog: {
+                house: {}
+            }
+        },
+        methods: {
+            cleanDialog: function () {
+                var this_ = this;
+                this_.dialog.house = null;
+            },
+            house_dialog: function (house) {
+                var this_ = this;
+                this_.cleanDialog()
+                this_.dialog.house = house;
+                $('#houseDialog').modal('show')
+            },
+            buyHouse: function () {
 
+            }
+        },
+        created() {
+            var this_ = this;
+            quest(API.show_all_houses, {}, function (result) {
+                if (result.code == 200) {
+                    this_.house_list = result.data
+                }
+            });
+        }
+    });
 </script>
 </html>

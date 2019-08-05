@@ -7,7 +7,7 @@
  */
 
 
-require_once('util/mysql.php');
+//require_once('util/mysql.php');
 require('util/MongoUtil.php');
 require('util/Calc.php');
 header("content-type", "application/json;charset=UTF-8");
@@ -166,8 +166,12 @@ function afterDay($placeId){
     MongoUtil::delete('product_of_place',['place_id'=>$placeId]);
     $place=MongoUtil::queryById('place',$placeId);
     $products=MongoUtil::query('product');
-    $remove_index=random_int(-1,count($products));
-    array_splice($products,$remove_index,1);
+
+    for($index=0;$index<count($products)/4;$index++){       //随即次数
+        $remove_index=random_int(0,(count($products)-1)*2);         //50%可能性，随机的产生一个可用索引
+        array_splice($products,$remove_index,1);       //去掉一个商品
+    }
+
     foreach ($products as $product){
         MongoUtil::insert('product_of_place',[
             '_id'=>strval(random_int(1, 9999999)),
@@ -180,7 +184,6 @@ function afterDay($placeId){
 
 
 @$func = $_REQUEST['func'];
-//@$placeId=$_REQUEST['placeId'];
 $result = null;
 switch ($func) {
     case 'marketInit':
@@ -200,7 +203,6 @@ switch ($func) {
     default:
         break;
 }
-
 if ($result <> null) {
     echo json_encode($result);
 }

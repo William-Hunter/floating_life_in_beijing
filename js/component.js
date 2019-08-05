@@ -4,19 +4,19 @@ var bottomBar = Vue.extend({
             <br><br><br>
             <div class="row">
                 <div class="col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2">
-                    <button class="btn btn-info" type="button" v-on:click="station">火车站</button>
+                    <button class="btn btn-primary" type="button" v-on:click="station">火车站</button>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-info" type="button" v-on:click="authentic">中南海</button>
+                    <button class="btn btn-primary" type="button" v-on:click="authentic">中南海</button>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-info" type="button" v-on:click="medic">江湖郎中</button>
+                    <button class="btn btn-primary" type="button" v-on:click="medic">江湖郎中</button>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-info" type="button" v-on:click="house">房产中介</button>
+                    <button class="btn btn-primary" type="button" v-on:click="house">房产中介</button>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-info" type="button" v-on:click="bank">地下钱庄</button>
+                    <button class="btn btn-primary" type="button" v-on:click="bank">地下钱庄</button>
                 </div>
             </div>
             <br><br><br>
