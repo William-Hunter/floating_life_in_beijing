@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>房产中介</title>
+    <title>中南海</title>
 
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/bootstrap.js"></script>
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./css/bootstrap.css">
     <style>
         .jumbotron {
-            background-image: url("img/house_saler.jpg");
+            background-image: url("img/governor.jpg");
             background-repeat: no-repeat;
             background-size: 100% 100%;
         }
@@ -28,20 +28,20 @@
         <div class="container-fluid">
             <div class="col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9">
                 <div class="row">
-                    <h1>售楼部</h1>
+                    <h1>衙门口</h1>
                     <p style="color:#F5BD00;"><strong>
-                        “呦，您可不知道，现在的城市里都是人，不盖点摩天大厦，怎么能安置那么多人？”
+                        “衙门口朝南开，有理没钱莫进来！”
                     </strong></p>
                 </div>
                 <div class="row">
-                    <div v-for="house in house_list">
+                    <div v-for="bribery in bribery_list">
                         <div class="col-md-3 col-md-offset-1 col-sm-3 col-sm-offset-1">
                             <p>
                                 <a href="#" class="btn btn-primary btn-lg btn-block" role="button"
-                                   v-on:click="house_dialog(house)">
-                                    <strong>{{house.name}}</strong><br>
-                                    ￥：{{house.price}}<br>
-                                    空间：{{house.stock}}
+                                   v-on:click="bribery_dialog(bribery)">
+                                    <strong>{{bribery.title}}</strong><br>
+                                    ￥：{{bribery.price}}<br>
+                                    洗罪：{{bribery.washout}}
                                 </a>
                             </p>
                         </div>
@@ -53,18 +53,18 @@
     </div>
     <foot-bar ref="bottomBar"></foot-bar>
 
-    <!-- 买房窗口 Modal -->
-    <div class="modal fade" id="houseDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <!-- 窗口 Modal -->
+    <div class="modal fade" id="Dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="ModalLabel">{{dialog.house.name}}</h4>
+                    <h4 class="modal-title" id="ModalLabel">{{dialog}}</h4>
                 </div>
                 <div class="modal-body">
-                    <p>您确定要买这个房子？,这将花费您{{dialog.house.price}}￥，给您带来{{dialog.house.stock}}空间</p>
+                    <p>您确定要买这个房子？,这将花费您{{dialog}}￥，给您带来{{dialog}}空间</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
@@ -77,20 +77,20 @@
 </body>
 <script type="text/javascript">
     Vue.component('foot-bar', bottomBar)
-    var vue = new Vue({
+    var vue=new Vue({
         el: '#all',
         data: {
-            house_list: [],
-            dialog: {
-                house: {}
+            bribery_list: [],
+            dialog:{
+                bribery:{}
             }
         },
-        methods: {
+        methods:{
             loaded: function () {
                 var this_ = this;
-                quest(API.showAllHouses, {}, function (result) {
+                quest(API.showAllBriberyPlan, {}, function (result) {
                     if (result.code == 200) {
-                        this_.house_list = result.data
+                        this_.bribery_list = result.data
                     }
                 });
             },
@@ -101,32 +101,19 @@
             },
             cleanDialog: function () {
                 var this_ = this;
-                this_.dialog.house = null;
+                this_.dialog = null;
             },
-            house_dialog: function (house) {
+            bribery_dialog:function(bribery){
                 var this_ = this;
                 this_.cleanDialog()
-                this_.dialog.house = house;
-                $('#houseDialog').modal('show')
+                this_.dialog.bribery = bribery;
+                $('#Dialog').modal('show')
             },
-            buyHouse: function (house) {
-                var this_ = this;
-                if (vue.$refs.bottomBar.state.money < house.price) {
-                    alert('没那么多钱还来买房子，有病啊！');
-                    return;
-                }
-                quest(API.buyHouses, {houseId: house._id}, function (result) {
-                    if (result.code == 200) {
-                        alert('购买成功，你花费了' + result.cost + '￥')
-                        this_.reload()
-                    } else {
-                        alert(result.msg)
-                    }
-                    $('#houseDialog').modal('hide')
-                });
+            bribery:function (bribery) {
+
             }
         },
-        created() {
+        created(){
             var this_ = this;
             this_.loaded();
         }

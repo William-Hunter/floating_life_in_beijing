@@ -25,5 +25,7 @@ var API = {
     mystate:web_root + '/cgi/CharacterController.php?func=mystate',
     buy:web_root + '/cgi/MarketController.php?func=buy',
     sell:web_root + '/cgi/MarketController.php?func=sell',
-    show_all_houses:web_root + '/cgi/HouseController.php?func=show',
+    showAllHouses:web_root + '/cgi/HouseController.php?func=show',
+    buyHouses:web_root + '/cgi/HouseController.php?func=buy',
+    showAllBriberyPlan:web_root + '/cgi/GovernorController.php?func=show',
 }

@@ -38,28 +38,32 @@ function market_product_mongo($placeId) {
 }
 
 function mystock_mongo() {
-    $command = [
-        'aggregate' => 'inventory',
-        'pipeline' => [
-            ['$lookup' => [
-                "from" => "product",
-                "localField" => "product_id",
-                "foreignField" => "_id",
-                "as" => "stock"
-            ]]
-        ],
-        'cursor' => (object)[]
-    ];
-    $stocks = MongoUtil::command($command);
-    $results = null;
-    if($stocks==null)return $results;
-    foreach ($stocks as $stock) {
-        $stock_name = $stock['stock'][0]->name;
-        $stock['name'] = $stock_name;
-        unset($stock['stock']);
-        $results[] = $stock;
+    try{
+        $command = [
+            'aggregate' => 'inventory',
+            'pipeline' => [
+                ['$lookup' => [
+                    "from" => "product",
+                    "localField" => "product_id",
+                    "foreignField" => "_id",
+                    "as" => "stock"
+                ]]
+            ],
+            'cursor' => (object)[]
+        ];
+        $stocks = MongoUtil::command($command);
+        $results = null;
+        if($stocks==null)return $results;
+        foreach ($stocks as $stock) {
+            $stock_name = $stock['stock'][0]->name;
+            $stock['name'] = $stock_name;
+            unset($stock['stock']);
+            $results[] = $stock;
+        }
+        return $results;
+    } catch (Exception $e) {
+        echo $e->getMessage();
     }
-    return $results;
 }
 
 /**
@@ -110,7 +114,7 @@ function buy($productId, $amount) {
             $re_bol = MongoUtil::insertOrUpdateById("inventory", $inventory);
             Calc::evilRise($buy_spend);
             if ($re_bol) {
-                return array("code" => 200, "msg" => "success");
+                return array("code" => 200, "msg" => "success","cost"=>$buy_spend,"money"=>$character['money']);
             }
         }
     } catch (Exception $e) {
@@ -119,30 +123,36 @@ function buy($productId, $amount) {
 }
 
 function sell($goodsId, $amount) {
-    //TODO 查询库存
-    $inventory = MongoUtil::queryById('inventory', $goodsId);
-    //TODO 验证数量
-    if ($amount > $inventory['quantity']) {
-        return array("code" => 500, "msg" => "库存数量不足");
-    } else {
-        //TODO 核算收入
+    try{
+        //TODO 查询库存
+        $inventory = MongoUtil::queryById('inventory', $goodsId);
         $product = MongoUtil::queryById('product', $inventory['product_id']);
-        $earn_money = $product['current_price'] * $amount;
-        $character = $data = MongoUtil::query("character", [], ['limit' => 1])[0];
-        $character_money = $character['money'] + $earn_money;
-        $character['money'] = round($character_money, 2);
-        $re_bol = MongoUtil::insertOrUpdateById("character", $character);
-        Calc::evilRise($earn_money);
-        //TODO 核算剩余库存
-        $quantity = $inventory['quantity'];
-        $inventory['quantity'] = $quantity - $amount;
-        if ($inventory['quantity'] <= 0) {
-            $re_bol = MongoUtil::deleteById("inventory", $inventory['_id']);
+        //TODO 验证数量
+        if ($amount > $inventory['quantity']) {
+            return array("code" => 500, "msg" => "库存数量不足");
         } else {
-            $re_bol = MongoUtil::insertOrUpdateById("inventory", $inventory);
+            //TODO 核算收入
+            $earn_money = $product['current_price'] * $amount;
+            $character = $data = MongoUtil::query("character", [], ['limit' => 1])[0];
+            $character_money = $character['money'] + $earn_money;
+            $character['money'] = round($character_money, 2);
+            $re_bol = MongoUtil::insertOrUpdateById("character", $character);
+            Calc::evilRise($earn_money);
+            //TODO 核算剩余库存
+            $quantity = $inventory['quantity'];
+            $inventory['quantity'] = $quantity - $amount;
+            if ($inventory['quantity'] <= 0) {
+                $re_bol = MongoUtil::deleteById("inventory", $inventory['_id']);
+            } else {
+                $re_bol = MongoUtil::insertOrUpdateById("inventory", $inventory);
+            }
         }
+        $earn=$amount*($product['current_price']-$inventory['buy_price']);
+        return array("code" => 200, "msg" => "success","earn"=>round($earn,2),"money"=>$character['money']);
+    } catch (Exception $e) {
+        return array("code" => 500, "msg" => $e->getMessage());
     }
-    return array("code" => 200, "msg" => "success");
+
 }
 
 
@@ -154,7 +164,6 @@ function afterDay($placeId){
     $debt=($state['interest']+1)*$state['debt'];
     $state['debt']=round($debt,2);
     MongoUtil::insertOrUpdateById('character',$state);
-
     //价格波动
     $product_list = MongoUtil::query("product", [], null);
     foreach ($product_list as $product){

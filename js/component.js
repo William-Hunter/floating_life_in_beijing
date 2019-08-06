@@ -4,19 +4,29 @@ var bottomBar = Vue.extend({
             <br><br><br>
             <div class="row">
                 <div class="col-md-offset-1 col-md-2 col-sm-offset-1 col-sm-2">
-                    <button class="btn btn-primary" type="button" v-on:click="station">火车站</button>
+                    <p>
+                        <button class="btn btn-primary btn-block" type="button" v-on:click="station">火车站</button>
+                    </p>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-primary" type="button" v-on:click="authentic">中南海</button>
+                    <p>
+                        <button class="btn btn-primary btn-block" type="button" v-on:click="authentic">中南海</button>
+                     </p>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-primary" type="button" v-on:click="medic">江湖郎中</button>
+                    <p>
+                        <button class="btn btn-primary btn-block" type="button" v-on:click="medic">江湖郎中</button>
+                    </p>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-primary" type="button" v-on:click="house">房产中介</button>
+                    <p>
+                        <button class="btn btn-primary btn-block" type="button" v-on:click="house">房产中介</button>
+                    </p>
                 </div>
                 <div class="col-md-2 col-sm-2">
-                    <button class="btn btn-primary" type="button" v-on:click="bank">地下钱庄</button>
+                    <p>
+                        <button class="btn btn-primary btn-block" type="button" v-on:click="bank">地下钱庄</button>
+                    </p>
                 </div>
             </div>
             <br><br><br>
@@ -43,16 +53,16 @@ var bottomBar = Vue.extend({
                 </div>
             </div>
         </div>`,
-    data:function () {
-        return {"state":{}}
+    data: function () {
+        return {"state": {}}
     },
     methods: {
-        Load:function(){
+        Load: function () {
             var this_ = this;
             var place_id = GetUrlParamter("id");
             quest(API.mystate, {}, function (data) {
                 if (data.code == 200) {
-                    this_.state=data.state
+                    this_.state = data.state
                     // console.log(this_.state)
                 }
             });
@@ -63,7 +73,7 @@ var bottomBar = Vue.extend({
         },
         authentic: function () {
             console.log("authentic")
-            window.location.href = web_root + "/authentic.html"
+            window.location.href = web_root + "/governor.html"
         },
         medic: function () {
             console.log("medic")
@@ -78,7 +88,7 @@ var bottomBar = Vue.extend({
             window.location.href = web_root + "/bank.html"
         }
     },
-    created(){
+    created() {
         var this_ = this;
         this_.Load();
     }

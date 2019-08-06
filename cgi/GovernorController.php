@@ -1,22 +1,18 @@
 <?php
+
 require('util/MongoUtil.php');
 require('util/Calc.php');
 
 
-/**
- * 返回所有的房子
- * @return array
- * @throws \MongoDB\Driver\Exception\Exception
- */
 function show() {
     try {
-        return array("code" => 200, "msg" => "success", "data" => MongoUtil::query('house'));
+        return array("code" => 200, "msg" => "success", "data" => MongoUtil::query('bribery'));
     } catch (Exception $e) {
         return array("code" => 500, "msg" => $e->getMessage());
     }
 }
 
-function buy($houseId) {
+function bribery($houseId) {
     try {
         $state = Calc::mystate();
         $house = MongoUtil::queryById('house', $houseId);
@@ -42,8 +38,11 @@ switch ($func) {
     case 'show':
         $result = show();
         break;
-    case 'buy':
-        $result = buy($_REQUEST['houseId']);
+    case 'bribery':
+        $result = bribery($_REQUEST['briberyId']);
+        break;
+    case 'deal':
+        $result = array("code" => 200, "msg" => "success");
         break;
     default:
         break;

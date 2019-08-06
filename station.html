@@ -13,24 +13,46 @@
     <script type="text/javascript" src="js/component.js"></script>
     <script type="text/javascript" src="js/util.js"></script>
 
+    <style>
+        .jumbotron {
+            background-image: url("img/station.jpg");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+    </style>
+
     <title>请选择车站</title>
 </head>
 <body>
 <div id="all">
-<div class="container-fluid" >
-    <div class="col-md-offset-5 col-md-6 col-sm-offset-5 col-sm-6">
-        <div v-for="place in place_list">
-            <br><br>
-            <a v-bind:href="'./market.html?id=' + place._id">
-                <button type="button" class="btn btn-primary">
-                    {{place.name}}
-                </button>
-            </a>
+    <div class="jumbotron">
+        <div class="container-fluid">
+            <div class="col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9">
+
+                <div class="row">
+                    <h1>火车站</h1>
+                    <p style="color:#F5BD00;"><strong>
+                        这里真是人声鼎沸，人来人往，比肩继踵
+                    </strong></p>
+                </div>
+                <div class="row">
+                    <div v-for="place in place_list">
+                        <div class="col-md-3 col-md-offset-1 col-sm-3 col-sm-offset-1">
+                            <p>
+                                <a v-bind:href="'./market.html?id=' + place._id">
+                                    <button type="button" class="btn btn-primary btn-lg btn-block">
+                                        {{place.name}}
+                                    </button>
+                                </a>
+                            </p>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-</div>
-    <foot-bar></foot-bar>
+    <foot-bar ref="bottomBar"></foot-bar>
 </div>
 </body>
 <script>

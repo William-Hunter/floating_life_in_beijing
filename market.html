@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" >我再想想</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
                     <button type="button" class="btn btn-primary" @click="buy">确认支付</button>
                 </div>
             </div>
@@ -141,7 +141,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" >我再想想</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
                     <button type="button" class="btn btn-primary" @click="sell">确认出售</button>
                 </div>
             </div>
@@ -152,29 +152,29 @@
 
 <script>
     Vue.component('foot-bar', bottomBar)
-    var vue=new Vue({
+    var vue = new Vue({
         el: '#all',
         data: {
             product_list: [],
             stock_list: [],
-            dialog:{
-                goods_id:'',
-                goods_name:'',
-                goods_price:0,
-                amount:0,
-                sell_price:0,
-                sell_product_id:'',
-                max_sell_amount:99999
+            dialog: {
+                goods_id: '',
+                goods_name: '',
+                goods_price: 0,
+                amount: 0,
+                sell_price: 0,
+                sell_product_id: '',
+                max_sell_amount: 99999
             },
         },
         methods: {
-            reload:function(){
-                var this_=this;
+            reload: function () {
+                var this_ = this;
                 this_.loaded();
                 vue.$refs.bottomBar.Load();
             },
-            loaded:function () {
-                var this_=this;
+            loaded: function () {
+                var this_ = this;
                 quest(API.marketInfo, {placeId: GetUrlParamter("id")}, function (data) {
                     if (data.code == 200) {
                         this_.product_list = data.market_products
@@ -183,22 +183,22 @@
                 });
             },
             buy_dialog: function (id, name, price) {
-                var this_=this;
+                var this_ = this;
                 this_.cleanDialog()
-                this_.dialog.goods_id=id;
+                this_.dialog.goods_id = id;
                 this_.dialog.goods_name = name;
                 this_.dialog.goods_price = price;
                 $('#buyDialog').modal('show')
             },
             sell_dialog: function (stock) {
-                var this_=this;
+                var this_ = this;
                 this_.cleanDialog()
-                this_.dialog.goods_id=stock._id;
+                this_.dialog.goods_id = stock._id;
                 this_.dialog.goods_name = stock.name;
                 this_.dialog.max_sell_amount = stock.quantity;
-                this_.dialog.sell_product_id=stock.product_id;
+                this_.dialog.sell_product_id = stock.product_id;
                 this_.product_list.forEach(function (product) {
-                    if(product._id==stock.product_id){
+                    if (product._id == stock.product_id) {
                         this_.dialog.sell_price = product.current_price;
                         console.log(this_.dialog.sell_price)
                     }
@@ -206,64 +206,77 @@
                 $('#sellDialog').modal('show')
             },
             cleanDialog: function () {
-                var this_=this;
-                this_.dialog.goods_id='';
+                var this_ = this;
+                this_.dialog.goods_id = '';
                 this_.dialog.goods_name = '';
                 this_.dialog.max_sell_amount = 0;
                 this_.dialog.amount = 0;
-                this_.dialog.sell_price=0;
-                this_.dialog.sell_product_id='';
+                this_.dialog.sell_price = 0;
+                this_.dialog.sell_product_id = '';
             },
-            buy:function () {
-                var this_=this;
-                if(this_.dialog.amount<=0){alert('数量不能为0');return}
-                if(this_.dialog.amount*this_.dialog.goods_price>vue.$refs.bottomBar.state.money){
+            buy: function () {
+                var this_ = this;
+                if (this_.dialog.amount <= 0) {
+                    alert('数量不能为0');
+                    return
+                }
+                if (this_.dialog.amount * this_.dialog.goods_price > vue.$refs.bottomBar.state.money) {
                     alert("你没有那么多钱");
                     return;
                 }
-                if((parseInt(this_.dialog.amount)+vue.$refs.bottomBar.state.stocked)
-                    >vue.$refs.bottomBar.state.stock){
+                if ((parseInt(this_.dialog.amount) + vue.$refs.bottomBar.state.stocked)
+                    > vue.$refs.bottomBar.state.stock) {
                     alert("仓库放不下那么多东西");
                     return;
                 }
                 quest(API.buy, {
                     productId: this_.dialog.goods_id,
-                    amount:parseInt(this_.dialog.amount)
+                    amount: parseInt(this_.dialog.amount)
                 }, function (data) {
                     if (data.code == 200) {
-                        alert('购买成功')
+                        alert('购买成功，你花费了'+data.cost+'￥')
                         this_.reload()
-                    }else{
+                    } else {
                         alert(data.msg)
                     }
                     $('#buyDialog').modal('hide')
                 });
             },
-            sell:function () {
-                var this_=this;
-                var sellable=false;
+            sell: function () {
+                var this_ = this;
+                var sellable = false;
+                if (this_.dialog.max_sell_amount<this_.dialog.amount){
+                    alert('你的库存数量不足');
+                    return;
+                }
                 this_.product_list.forEach(function (product) {
-                    if(product._id==this_.dialog.sell_product_id)sellable=true;
+                    if (product._id == this_.dialog.sell_product_id)
+                        sellable = true;
                 })
-                if(!sellable){alert('此处不收购此种商品');return}
-                if(this_.dialog.amount<=0){alert('出售数量不能为0');return}
+                if (!sellable) {
+                    alert('此处不收购此种商品');
+                    return
+                }
+                if (this_.dialog.amount <= 0) {
+                    alert('出售数量不能为0');
+                    return;
+                }
                 quest(API.sell, {
                     goodsId: this_.dialog.goods_id,
-                    amount:parseInt(this_.dialog.amount)
+                    amount: parseInt(this_.dialog.amount)
                 }, function (data) {
                     if (data.code == 200) {
-                        alert('出售成功')
+                        alert('出售成功，你赚了'+data.earn+'￥')
                         this_.reload()
-                    }else{
+                    } else {
                         alert(data.msg)
                     }
                     $('#sellDialog').modal('hide')
-
                 });
             },
         },
         created() {
-            var this_=this;
+            var this_ = this;
             quest(API.marketInit, {
                 placeId: GetUrlParamter("id")
             }, function (data) {
