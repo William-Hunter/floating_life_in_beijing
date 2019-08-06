@@ -28,4 +28,8 @@ var API = {
     showAllHouses:web_root + '/cgi/HouseController.php?func=show',
     buyHouses:web_root + '/cgi/HouseController.php?func=buy',
     showAllBriberyPlan:web_root + '/cgi/GovernorController.php?func=show',
+    buyBriberyPlan:web_root + '/cgi/GovernorController.php?func=bribery',
+    showAllSurgery:web_root + '/cgi/HospitalController.php?func=show',
+    dealSurgery:web_root + '/cgi/HospitalController.php?func=deal',
+    bankInit:web_root + '/cgi/BankController.php?func=init',
 }

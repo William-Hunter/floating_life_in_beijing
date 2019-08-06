@@ -61,14 +61,16 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="ModalLabel">{{dialog}}</h4>
+                    <h4 class="modal-title" id="ModalLabel">洗罪套餐</h4>
                 </div>
                 <div class="modal-body">
-                    <p>您确定要买这个房子？,这将花费您{{dialog}}￥，给您带来{{dialog}}空间</p>
+                    <p>您确定要买这个{{dialog.bribery.title}}？,
+                        这将花费您{{dialog.bribery.price}}￥，
+                        给您洗脱{{dialog.bribery.washout}}点罪恶</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
-                    <button type="button" class="btn btn-primary" @click="buyHouse(dialog.house)">确认购买</button>
+                    <button type="button" class="btn btn-primary" @click="buyBribery(dialog.bribery)">确认行贿</button>
                 </div>
             </div>
         </div>
@@ -101,7 +103,7 @@
             },
             cleanDialog: function () {
                 var this_ = this;
-                this_.dialog = null;
+                this_.dialog.bribery = null;
             },
             bribery_dialog:function(bribery){
                 var this_ = this;
@@ -109,8 +111,21 @@
                 this_.dialog.bribery = bribery;
                 $('#Dialog').modal('show')
             },
-            bribery:function (bribery) {
-
+            buyBribery:function (bribery) {
+                var this_ = this;
+                if(bribery.price>vue.$refs.bottomBar.state.money){
+                    alert("没钱还来叨扰，找打是吧！");
+                    return;
+                }
+                quest(API.buyBriberyPlan, {briberyId: bribery._id}, function (result) {
+                    if (result.code == 200) {
+                        alert('购买成功，你花费了' + result.cost + '￥')
+                        this_.reload()
+                    } else {
+                        alert(result.msg)
+                    }
+                    $('#Dialog').modal('hide')
+                });
             }
         },
         created(){
