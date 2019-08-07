@@ -5,35 +5,31 @@ require('util/Calc.php');
 
 function init() {
     try {
-        $state = Calc::mystate();
-        $randomRate=random_int(0,100)/100;
-        $state["interest"] = $randomRate;
-        MongoUtil::insertOrUpdateById('character', $state);
+        $state=Calc::rateChange();
         return array(
             "code" => 200, "msg" => "success",
-            "rate" => $randomRate,"debt"=>$state["debt"]
+            "rate" => $state['interest'],"debt"=>$state["debt"]
         );
     } catch (Exception $e) {
         return array("code" => 500, "msg" => $e->getMessage());
     }
 }
 
-function borrow($surgeryId) {
+function borrow($money) {
     try {
         $state = Calc::mystate();
-        $surgery = MongoUtil::queryById('surgery', $surgeryId);
-        if ($state['money'] < $surgery['price']) {
-            throw new Exception("你没有足够钱支付手术费");
+        if ($state['money'] < $money) {
+            throw new Exception("你没有足够钱去还钱");
         }
-        $newHeal=$state['health'] + $surgery['heal'];
-        $state["health"] = (int)($newHeal>100?100:$newHeal);
-        $newPrice = $state['money'] - $surgery['price'];
-        $state["money"] = $newPrice;
+        $newMoney = $state['money'] + $money;
+        $state["money"] = $newMoney;
+        $newDebt = $state['debt'] + $money;
+        $state["debt"] = $newDebt;
         MongoUtil::insertOrUpdateById('character', $state);
         return array(
             "code" => 200,
             "msg" => 'success',
-            "cost" => $surgery['price'],
+            "cost" => $money,
             "money" => $state['money']
         );
     } catch (Exception $e) {
@@ -42,22 +38,19 @@ function borrow($surgeryId) {
 }
 
 
-function repay($surgeryId) {
+function repay($pay_money) {
     try {
         $state = Calc::mystate();
-        $surgery = MongoUtil::queryById('surgery', $surgeryId);
-        if ($state['money'] < $surgery['price']) {
-            throw new Exception("你没有足够钱支付手术费");
-        }
-        $newHeal=$state['health'] + $surgery['heal'];
-        $state["health"] = (int)($newHeal>100?100:$newHeal);
-        $newPrice = $state['money'] - $surgery['price'];
-        $state["money"] = $newPrice;
+        $pay_money=$pay_money>$state['debt']?$state['debt']:$pay_money;
+        $newMoney = $state['money'] - $pay_money;
+        $state["money"] = $newMoney;
+        $newDebt = $state['debt'] - $pay_money;
+        $state["debt"] = $newDebt;
         MongoUtil::insertOrUpdateById('character', $state);
         return array(
             "code" => 200,
             "msg" => 'success',
-            "cost" => $surgery['price'],
+            "cost" => $pay_money,
             "money" => $state['money']
         );
     } catch (Exception $e) {

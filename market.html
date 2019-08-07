@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,
+     user-scalable=no">
     <title>黑市</title>
 
     <script type="text/javascript" src="./js/jquery.js"></script>
@@ -42,10 +43,11 @@
                     <tbody>
                     <tr class="active" v-for="product in product_list">
                         <td>{{product.name}}</td>
-                        <td>{{product.current_price}}</td>
+                        <td>{{product.current_price.toLocaleString('en-US')}}</td>
                         <td>
                             <button type="button" class="btn btn-info"
-                                    v-on:click="buy_dialog(product._id,product.name,product.current_price)">BUY
+                                    v-on:click="buy_dialog(product._id,product.name,product.current_price)">
+                                BUY
                             </button>
                         </td>
                     </tr>
@@ -65,7 +67,7 @@
                     <tbody>
                     <tr class="active" v-for="stock in stock_list">
                         <td>{{stock.name}}</td>
-                        <td>{{stock.buy_price}}</td>
+                        <td>{{stock.buy_price.toLocaleString('en-US')}}</td>
                         <td>{{stock.quantity}}</td>
                         <td>
                             <button type="button" class="btn btn-info"
@@ -93,14 +95,17 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
-                            <input type="number" class="form-control" id="buyAmount" placeholder="请输入数量" min="0"
-                                   step="1" v-model="dialog.amount">
+                            <input type="number" class="form-control" id="buyAmount"
+                                   placeholder="请输入数量" min="0" step="1" v-model="dialog.amount">
                         </div>
                         <div class="col-md-6 col-sm-6">
                             <div class="input-group">
-                                <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
-                                <input type="number" class="form-control" id="buyPrice" value="0" min="0" step="1"
-                                       v-bind:value="dialog.amount*dialog.goods_price" readonly>
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-yen"></span>
+                                </div>
+                                <input type="number" class="form-control" id="buyPrice" value="0"
+                                       min="0" step="1" readonly
+                                       v-bind:value="dialog.amount*dialog.goods_price">
                             </div>
                         </div>
                     </div>
@@ -121,20 +126,25 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="sellModalLabel">您打算卖出多少{{dialog.goods_name}}？</h4>
+                    <h4 class="modal-title" id="sellModalLabel">
+                        您打算卖出多少{{dialog.goods_name}}？
+                    </h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
-                            <input type="number" class="form-control" id="sellAmount" placeholder="请输入数量"
-                                   v-bind:max="dialog.max_sell_amount" min="0"
-                                   step="1" v-model="dialog.amount">
+                            <input type="number" class="form-control" id="sellAmount"
+                                   placeholder="请输入数量" v-bind:max="dialog.max_sell_amount"
+                                   min="0" step="1" v-model="dialog.amount">
                         </div>
                         <div class="col-md-6 col-sm-6">
                             <div class="input-group">
-                                <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
-                                <input type="number" class="form-control" id="sellPrice" value="0" min="0" step="1"
-                                       v-bind:value="dialog.amount*dialog.sell_price" readonly>
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-yen"></span>
+                                </div>
+                                <input type="number" class="form-control" id="sellPrice" value="0"
+                                       min="0" step="1" readonly
+                                       v-bind:value="dialog.amount*dialog.sell_price" >
                             </div>
                         </div>
                     </div>

@@ -31,21 +31,33 @@ var bottomBar = Vue.extend({
             </div>
             <br><br><br>
             <div class="row">
-                <div class="col-md-offset-2 col-md-3 col-sm-offset-2 col-sm-3">
+                <div class="col-md-offset-2 col-md-2 col-sm-offset-2 col-sm-2">
+                    <div class="row">
+                        时间<span class="badge">{{state.date}}/40</span>
+                    </div>
+                    <div class="row">
+                        
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-2">
+                    <div class="row">
+                        罪恶<span class="badge">{{state.crime}}</span>
+                    </div>
                     <div class="row">
                         健康 <span class="badge">{{state.health}}%</span>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-2">
+                    <div class="row">
+                        仓储 <span class="badge">{{state.stocked}}/{{state.stock}}</span>
                     </div>
                     <div class="row">
                         资金 <span class="badge">{{state.money}}￥</span>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-3">
-                <div class="row">罪恶<span class="badge">{{state.crime}}</span></div>
-                <div class="row">时间<span class="badge">{{state.date}}/40</span></div>
-                </div>
-                <div class="col-md-3 col-sm-3">
+                <div class="col-md-2 col-sm-2">
                     <div class="row">
-                        仓储 <span class="badge">{{state.stocked}}/{{state.stock}}</span>
+                        利率 <span class="badge">{{state.interest*100}}%</span>
                     </div>
                     <div class="row">
                         负债 <span class="badge">{{state.debt}}￥</span>
@@ -63,7 +75,8 @@ var bottomBar = Vue.extend({
             quest(API.mystate, {}, function (data) {
                 if (data.code == 200) {
                     this_.state = data.state
-                    // console.log(this_.state)
+                    this_.state.money=this_.state.money.toLocaleString('en-US')
+                    this_.state.debt=this_.state.debt.toLocaleString('en-US')
                 }
             });
         },

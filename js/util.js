@@ -32,4 +32,10 @@ var API = {
     showAllSurgery:web_root + '/cgi/HospitalController.php?func=show',
     dealSurgery:web_root + '/cgi/HospitalController.php?func=deal',
     bankInit:web_root + '/cgi/BankController.php?func=init',
+    borrow:web_root + '/cgi/BankController.php?func=borrow',
+    repay:web_root + '/cgi/BankController.php?func=repay',
+
+
+
 }
+

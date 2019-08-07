@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,
+    user-scalable=no">
     <title>地下钱庄</title>
 
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/bootstrap.js"></script>
     <script type="text/javascript" src="./js/vue.js"></script>
     <script type="text/javascript" src="js/component.js"></script>
+    <script type="text/javascript" src="js/filter.js"></script>
     <script type="text/javascript" src="js/util.js"></script>
 
     <link rel="stylesheet" href="./css/bootstrap.css">
@@ -30,7 +32,7 @@
                 <div class="row">
                     <h1>驴打滚</h1>
                     <p style="color:#F5BD00;"><strong>
-                        “最近打贸易战你知道吗？，生意越来越不好做了，只能把利率设为{{rate}}%了，
+                        “最近打贸易战你知道吗？，生意越来越不好做了，只能把利率设为{{rate*100}}%了，
                         看好了小伙子，是复利。你现在欠款{{debt}}￥”
                     </strong></p>
                 </div>
@@ -56,7 +58,6 @@
         </div>
     </div>
 
-
     <foot-bar ref="bottomBar"></foot-bar>
     <!-- 窗口 Modal -->
     <div class="modal fade" id="Dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -66,15 +67,27 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="ModalLabel">您确定要做这个{{dialog}}？</h4>
+                    <h4 class="modal-title" id="ModalLabel">
+                        <div v-if="dialog.type=='repay'">你打算还多少？</div>
+                        <div v-else>你打算借多少？</div>
+                    </h4>
                 </div>
                 <div class="modal-body">
-                    <p>这将花费您{{dialog}}￥，
-                        给您带来{{dialog}}健康</p>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-yen"></span>
+                        </div>
+                        <input type="number"
+                               class="form-control" id="money" min="0" step="100"
+                               placeholder="请输入金额" v-model="dialog.money">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
-                    <button type="button" class="btn btn-primary" @click="deal(dialog)">确认手术</button>
+                    <button type="button" class="btn btn-primary" @click="deal(dialog.type)">
+                        <div v-if="dialog.type=='repay'">确认还钱</div>
+                        <div v-else>确认借钱</div>
+                    </button>
                 </div>
             </div>
         </div>
@@ -86,18 +99,21 @@
     Vue.component('foot-bar', bottomBar)
     var vue = new Vue({
         el: '#all',
-        data:{
-            rate:{},
-            debt:{},
-            dialog: {}
+        data: {
+            rate: {},
+            debt: {},
+            dialog: {
+                type: {},
+                money: {},
+            }
         },
-        methods:{
+        methods: {
             loaded: function () {
                 var this_ = this;
                 quest(API.bankInit, {}, function (result) {
                     if (result.code == 200) {
-                        this_.rate=result.rate
-                        this_.debt=result.debt;
+                        this_.rate = result.rate
+                        this_.debt = result.debt.toLocaleString('en-US');
                     }
                 });
             },
@@ -108,14 +124,42 @@
             },
             cleanDialog: function () {
                 var this_ = this;
-                this_.dialog.surgery = null;
+                this_.dialog.type = null;
+                this_.dialog.money = null;
             },
-            show_dialog:function (surgery) {
+            show_dialog: function (type) {
                 var this_ = this;
                 this_.cleanDialog()
-                this_.dialog.surgery = surgery;
+                this_.dialog.type = type
                 $('#Dialog').modal('show')
             },
+            deal: function (type) {
+                var this_ = this;
+                this_.dialog.money = parseFloat(this_.dialog.money)
+                var api;
+                if (type == 'repay') {
+                    api = API.repay;
+                    if (this_.dialog.money < vue.$refs.bottomBar.state.money) {
+                        alert('你没有那么多钱');
+                        return
+                    }
+                } else {
+                    api = API.borrow;
+                }
+                quest(api, {money: this_.dialog.money}, function (result) {
+                    if (result.code == 200) {
+                        if (type == 'repay') {
+                            alert('还钱完毕，您花费了' + result.cost.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
+                        } else {
+                            alert('借钱完毕，您的到了' + result.cost.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
+                        }
+                        $('#Dialog').modal('hide')
+                        this_.reload()
+                    } else {
+                        alert(result.msg)
+                    }
+                });
+            }
         },
         created() {
             var this_ = this;

@@ -157,13 +157,22 @@ function sell($goodsId, $amount) {
 
 
 function afterDay($placeId){
-    //日子过去一天了，债务也在涨
     $state=MongoUtil::query("character",[],['limit' => 1])[0];
+    $event='';
+
+    //健康损失随机事件
+    $event.'我被打了，损失10点健康';
+
+    //利率波动
+    Calc::rateChange();
+
+    //日子过去一天了，债务也在涨
     $new_day=$state['date']+1;
     $state['date']=(int)$new_day;
     $debt=($state['interest']+1)*$state['debt'];
     $state['debt']=round($debt,2);
     MongoUtil::insertOrUpdateById('character',$state);
+
     //价格波动
     $product_list = MongoUtil::query("product", [], null);
     foreach ($product_list as $product){
@@ -171,24 +180,25 @@ function afterDay($placeId){
         $product['current_price']=round($new_price,2);
         MongoUtil::insertOrUpdateById('product',$product);
     }
+
 //  地区商品波动
     MongoUtil::delete('product_of_place',['place_id'=>$placeId]);
     $place=MongoUtil::queryById('place',$placeId);
     $products=MongoUtil::query('product');
-
-    for($index=0;$index<count($products)/4;$index++){       //随即次数
-        $remove_index=random_int(0,(count($products)-1)*2);         //50%可能性，随机的产生一个可用索引
+    for($index=0;$index<count($products)/4;$index++){               //操作商品总数的的4分之1次
+        $remove_index=random_int(0,(count($products)-1)*2);         //每次有50%可能性，去掉一个随机商品
         array_splice($products,$remove_index,1);       //去掉一个商品
     }
-
-    foreach ($products as $product){
+    foreach ($products as $product){                                //循环插入地区的商品
         MongoUtil::insert('product_of_place',[
             '_id'=>strval(random_int(1, 9999999)),
             'product_id'=>$product['_id'],
             'place_id'=> $place['_id']
         ]);
     }
-    return array("code" => 200, "msg" => "success");
+    return array("code" => 200, "msg" => "success",
+        "event"=>$event,
+    );
 }
 
 

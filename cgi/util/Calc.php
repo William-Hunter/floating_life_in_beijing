@@ -41,13 +41,21 @@ class Calc {
      * @return mixed
      * @throws \MongoDB\Driver\Exception\Exception
      */
-    function mystate(){
+    final static public function mystate(){
         $state=MongoUtil::query("character",[],['limit' => 1])[0];
         $stockAmount=Calc::myStockAmount();
         if($stockAmount==null)$stockAmount=0;
         $state['stocked']=$stockAmount;
         return $state;
     }
+
+    final static public function rateChange(){
+        $state = Calc::mystate();
+        $state["interest"] = round(random_int(5,30)/100,2);
+        MongoUtil::insertOrUpdateById('character', $state);
+        return $state;
+    }
+
 
 }
 ?>
