@@ -34,7 +34,7 @@ var API = {
     bankInit:web_root + '/cgi/BankController.php?func=init',
     borrow:web_root + '/cgi/BankController.php?func=borrow',
     repay:web_root + '/cgi/BankController.php?func=repay',
-
+    reset:web_root + '/cgi/CharacterController.php?func=reset',
 
 
 }

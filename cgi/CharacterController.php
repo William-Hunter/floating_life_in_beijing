@@ -9,11 +9,26 @@
 require('util/MongoUtil.php');
 require('util/Calc.php');
 
-
+function recover(){
+    $state=MongoUtil::query("character",[],['limit' => 1])[0];
+    $state['health']=100;
+    $state['money']=0;
+    $state['stock']=100;
+    $state['debt']=0;
+    $state['interest']=0;
+    $state['crime']=0;
+    $state['date']=0;
+    $state['stocked']=0;
+    MongoUtil::insertOrUpdateById('character',$state);
+    return array("code"=>200,"msg"=>"success");
+}
 
 @$func=$_REQUEST['func'];
 $result=null;
 switch ($func){
+    case 'reset':
+        $result=recover();
+        break;
     case 'mystate':
         $result=array("code"=>200,"msg"=>"success","state"=>Calc::mystate());
         break;

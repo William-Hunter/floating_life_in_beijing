@@ -52,15 +52,15 @@ var bottomBar = Vue.extend({
                         仓储 <span class="badge">{{state.stocked}}/{{state.stock}}</span>
                     </div>
                     <div class="row">
-                        资金 <span class="badge">{{state.money}}￥</span>
+                        资金 <span class="badge">{{state.money.toLocaleString('en-US')}}￥</span>
                     </div>
                 </div>
                 <div class="col-md-2 col-sm-2">
                     <div class="row">
-                        利率 <span class="badge">{{state.interest*100}}%</span>
+                        利率 <span class="badge">{{state.interest}}%</span>
                     </div>
                     <div class="row">
-                        负债 <span class="badge">{{state.debt}}￥</span>
+                        负债 <span class="badge">{{state.debt.toLocaleString('en-US')}}￥</span>
                     </div>
                 </div>
             </div>
@@ -75,8 +75,7 @@ var bottomBar = Vue.extend({
             quest(API.mystate, {}, function (data) {
                 if (data.code == 200) {
                     this_.state = data.state
-                    this_.state.money=this_.state.money.toLocaleString('en-US')
-                    this_.state.debt=this_.state.debt.toLocaleString('en-US')
+                    this_.state.interest=parseInt(this_.state.interest*100)
                 }
             });
         },

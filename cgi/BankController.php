@@ -5,7 +5,9 @@ require('util/Calc.php');
 
 function init() {
     try {
-        $state=Calc::rateChange();
+        $state=Calc::mystate();
+        $state['interest']=Calc::rateChange();
+        MongoUtil::insertOrUpdateById("character",$state);
         return array(
             "code" => 200, "msg" => "success",
             "rate" => $state['interest'],"debt"=>$state["debt"]
@@ -18,9 +20,6 @@ function init() {
 function borrow($money) {
     try {
         $state = Calc::mystate();
-        if ($state['money'] < $money) {
-            throw new Exception("你没有足够钱去还钱");
-        }
         $newMoney = $state['money'] + $money;
         $state["money"] = $newMoney;
         $newDebt = $state['debt'] + $money;
@@ -29,7 +28,6 @@ function borrow($money) {
         return array(
             "code" => 200,
             "msg" => 'success',
-            "cost" => $money,
             "money" => $state['money']
         );
     } catch (Exception $e) {
@@ -50,7 +48,6 @@ function repay($pay_money) {
         return array(
             "code" => 200,
             "msg" => 'success',
-            "cost" => $pay_money,
             "money" => $state['money']
         );
     } catch (Exception $e) {

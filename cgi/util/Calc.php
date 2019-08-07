@@ -50,10 +50,7 @@ class Calc {
     }
 
     final static public function rateChange(){
-        $state = Calc::mystate();
-        $state["interest"] = round(random_int(5,30)/100,2);
-        MongoUtil::insertOrUpdateById('character', $state);
-        return $state;
+        return  round(random_int(5,15)/100,2);
     }
 
 

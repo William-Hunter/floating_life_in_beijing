@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>江湖郎中</title>
+    <title>春光楼</title>
 
     <script type="text/javascript" src="./js/jquery.js"></script>
     <script type="text/javascript" src="./js/bootstrap.js"></script>
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="./css/bootstrap.css">
     <style>
         .jumbotron {
-            background-image: url("img/hospital.jpg");
+            background-image: url("img/hooker.jpg");
             background-repeat: no-repeat;
             background-size: 100% 100%;
         }
@@ -29,9 +29,9 @@
         <div class="container-fluid">
             <div class="col-md-offset-1 col-md-9 col-sm-offset-1 col-sm-9">
                 <div class="row">
-                    <h1>悬壶济世</h1>
+                    <h1>玉体陈横</h1>
                     <p style="color:#F5BD00;"><strong>
-                        “您今天打算得点什么病？”
+                        “来啊，快活啊，反正有大把时光”
                     </strong></p>
                 </div>
                 <div class="row">
@@ -42,7 +42,7 @@
                                    v-on:click="show_dialog(surgery)">
                                     <strong>{{surgery.title}}</strong><br>
                                     ￥：{{surgery.price}}<br>
-                                    治疗：{{surgery.heal}}
+                                    舒适：{{surgery.heal}}
                                 </a>
                             </p>
                         </div>
@@ -63,15 +63,15 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="ModalLabel">您确定要做这个{{dialog.surgery.title}}？</h4>
+                    <h4 class="modal-title" id="ModalLabel">您确定要做这个{{dialog.surgery.title}}保健？</h4>
                 </div>
                 <div class="modal-body">
                     <p>这将花费您{{dialog.surgery.price}}￥，
-                        给您带来{{dialog.surgery.heal}}健康</p>
+                        给您带来{{dialog.surgery.heal}}舒适</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">我再想想</button>
-                    <button type="button" class="btn btn-primary" @click="deal(dialog.surgery)">确认手术</button>
+                    <button type="button" class="btn btn-primary" @click="deal(dialog.surgery)">确认支付</button>
                 </div>
             </div>
         </div>

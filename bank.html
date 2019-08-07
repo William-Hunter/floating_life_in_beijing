@@ -149,9 +149,9 @@
                 quest(api, {money: this_.dialog.money}, function (result) {
                     if (result.code == 200) {
                         if (type == 'repay') {
-                            alert('还钱完毕，您花费了' + result.cost.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
+                            alert('还钱完毕，您还了' + this_.dialog.money.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
                         } else {
-                            alert('借钱完毕，您的到了' + result.cost.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
+                            alert('借钱完毕，您借了' + this_.dialog.money.toLocaleString('en-US') + '￥，您目前有' + result.money.toLocaleString('en-US') + '￥')
                         }
                         $('#Dialog').modal('hide')
                         this_.reload()

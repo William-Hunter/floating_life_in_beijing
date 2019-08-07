@@ -45,6 +45,9 @@
         el: '#station',
         methods: {
             jumpToStation: function () {
+                quest(API.reset, {}, function (result) {
+                    // console.log(result);
+                });
                 window.location.href = web_root+"/station.html"
             }
         }

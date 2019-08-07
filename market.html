@@ -37,6 +37,7 @@
                     <tr>
                         <th>商品</th>
                         <th>价格￥</th>
+                        <th>基本价格￥</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -44,6 +45,7 @@
                     <tr class="active" v-for="product in product_list">
                         <td>{{product.name}}</td>
                         <td>{{product.current_price.toLocaleString('en-US')}}</td>
+                        <td>{{product.base_price.toLocaleString('en-US')}}</td>
                         <td>
                             <button type="button" class="btn btn-info"
                                     v-on:click="buy_dialog(product._id,product.name,product.current_price)">
@@ -229,7 +231,10 @@
                     alert('数量不能为0');
                     return
                 }
-                if (this_.dialog.amount * this_.dialog.goods_price > vue.$refs.bottomBar.state.money) {
+                console.log(
+                    (this_.dialog.amount * this_.dialog.goods_price) , vue.$refs.bottomBar.state.money
+                )
+                if ((this_.dialog.amount * this_.dialog.goods_price) > vue.$refs.bottomBar.state.money) {
                     alert("你没有那么多钱");
                     return;
                 }
@@ -286,11 +291,26 @@
         },
         created() {
             var this_ = this;
-            quest(API.marketInit, {
-                placeId: GetUrlParamter("id")
-            }, function (data) {
+            var msg='';
+            quest(API.marketInit, {placeId: GetUrlParamter("id")}, function (result) {
+                if(result.event&&result.event!=''){
+                    for(var index in result.event){
+                        msg=msg+result.event[index]+'\n'
+                    }
+                }
             });
             this_.loaded()
+            setTimeout(function () {
+                alert(msg);
+                if(vue.$refs.bottomBar.state.health<=0){
+                    alert('您牺牲在中国大地了,游戏结束');
+                    window.location.href = web_root + "/index.html"
+                }
+                if(vue.$refs.bottomBar.state.date>40){
+                    alert('您的时间耗尽,游戏结束');
+                    window.location.href = web_root + "/index.html"
+                }
+            },2000);
         }
     })
 </script>
