@@ -139,7 +139,8 @@
                 var api;
                 if (type == 'repay') {
                     api = API.repay;
-                    if (this_.dialog.money < vue.$refs.bottomBar.state.money) {
+                    console.log(this_.dialog.money , vue.$refs.bottomBar.state.money)
+                    if (this_.dialog.money > vue.$refs.bottomBar.state.money) {
                         alert('你没有那么多钱');
                         return
                     }
@@ -149,7 +150,7 @@
                 quest(api, {money: this_.dialog.money}, function (result) {
                     if (result.code == 200) {
                         if (type == 'repay') {
-                            alert('还钱完毕，您还了' + this_.dialog.money.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
+                            alert('还钱完毕，您还了' + result.cost.toLocaleString('en-US') + '￥，您现在还有' + result.money.toLocaleString('en-US') + '￥')
                         } else {
                             alert('借钱完毕，您借了' + this_.dialog.money.toLocaleString('en-US') + '￥，您目前有' + result.money.toLocaleString('en-US') + '￥')
                         }

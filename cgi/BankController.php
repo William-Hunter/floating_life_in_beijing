@@ -48,6 +48,7 @@ function repay($pay_money) {
         return array(
             "code" => 200,
             "msg" => 'success',
+            "cost"=>$pay_money,
             "money" => $state['money']
         );
     } catch (Exception $e) {

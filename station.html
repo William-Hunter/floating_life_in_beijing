@@ -57,7 +57,7 @@
 </body>
 <script>
     Vue.component('foot-bar', bottomBar)
-    new Vue({
+    var vue=new Vue({
         el: '#all',
         data: {
             place_list: []
@@ -67,6 +67,7 @@
             quest(API.stations, {}, function (data) {
                 this_.place_list = data
             });
+            // vue.$refs.bottomBar.Load();
         }
     })
 </script>

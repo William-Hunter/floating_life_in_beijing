@@ -12,9 +12,9 @@ require('util/Calc.php');
 function recover(){
     $state=MongoUtil::query("character",[],['limit' => 1])[0];
     $state['health']=100;
-    $state['money']=0;
+    $state['money']=2200;
     $state['stock']=100;
-    $state['debt']=0;
+    $state['debt']=2200;
     $state['interest']=0;
     $state['crime']=0;
     $state['date']=0;

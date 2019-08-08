@@ -124,21 +124,21 @@ function buy($productId, $amount) {
 
 function sell($goodsId, $amount) {
     try {
-        //TODO 查询库存
+        //查询库存
         $inventory = MongoUtil::queryById('inventory', $goodsId);
         $product = MongoUtil::queryById('product', $inventory['product_id']);
-        //TODO 验证数量
+        //验证数量
         if ($amount > $inventory['quantity']) {
             return array("code" => 500, "msg" => "库存数量不足");
         } else {
-            //TODO 核算收入
+            //核算收入
             $earn_money = $product['current_price'] * $amount;
             $character = $data = MongoUtil::query("character", [], ['limit' => 1])[0];
             $character_money = $character['money'] + $earn_money;
             $character['money'] = round($character_money, 2);
             $re_bol = MongoUtil::insertOrUpdateById("character", $character);
             Calc::evilRise($earn_money);
-            //TODO 核算剩余库存
+            //核算剩余库存
             $quantity = $inventory['quantity'];
             $inventory['quantity'] = $quantity - $amount;
             if ($inventory['quantity'] <= 0) {
@@ -157,10 +157,47 @@ function sell($goodsId, $amount) {
 
 
 function afterDay($placeId) {
+
+    $event = [];
+
+    //价格波动
+    $product_list = MongoUtil::query("product", [], null);
+    foreach ($product_list as $product) {
+        changePrice($product,(random_int(5, 15) / 10.0));
+    }
+
+    //市场随机事件，
+    $event_list = MongoUtil::query("event", [], null);
+    if(random_int(0, 20)>10){
+        $randomEventIndex=random_int(0, (count($event_list) - 1));
+        $randomEvent=$event_list[$randomEventIndex];
+        $product = MongoUtil::queryById('product', $randomEvent['product_id']);
+        changePrice($product,$randomEvent['coefficient']);
+        $riseOrDown=$randomEvent['coefficient']>=1?'上涨了':'下跌了';
+        $event[] = $randomEvent['context'] .',价格'. $riseOrDown.($randomEvent['coefficient']*100).'%';
+    }
+
+
+//  地区商品波动
+    MongoUtil::delete('product_of_place', ['place_id' => $placeId]);
+    $place = MongoUtil::queryById('place', $placeId);
+    $products = MongoUtil::query('product');
+    for ($index = 0; $index < count($products) / 4; $index++) {               //操作商品总数的的4分之1次
+        $remove_index = random_int(0, (count($products) - 1) * 2);         //每次有50%可能性，去掉一个随机商品
+        array_splice($products, $remove_index, 1);       //去掉一个商品
+    }
+    foreach ($products as $product) {                                //循环插入地区的商品
+        MongoUtil::insert('product_of_place', [
+            '_id' => strval(random_int(1, 9999999)),
+            'product_id' => $product['_id'],
+            'place_id' => $place['_id']
+        ]);
+    }
+
+    //个人信息
     $state = MongoUtil::query("character", [], ['limit' => 1])[0];
     $new_day = $state['date'] + 1;
     $state['date'] = (int)$new_day;
-    $event = [];
 
     //健康损失随机事件
     if (random_int(1, 10) > 7) {         //事件发生的机率
@@ -178,31 +215,15 @@ function afterDay($placeId) {
     $debt = ($state['interest'] + 1) * $state['debt'];
     $state['debt'] = round($debt, 2);
     MongoUtil::insertOrUpdateById('character', $state);
+    
 
-    //价格波动
-    $product_list = MongoUtil::query("product", [], null);
-    foreach ($product_list as $product) {
-        $new_price = $product['base_price'] * (random_int(1, 19) / 10.0);
-        $product['current_price'] = round($new_price, 2);
-        MongoUtil::insertOrUpdateById('product', $product);
-    }
-
-//  地区商品波动
-    MongoUtil::delete('product_of_place', ['place_id' => $placeId]);
-    $place = MongoUtil::queryById('place', $placeId);
-    $products = MongoUtil::query('product');
-    for ($index = 0; $index < count($products) / 4; $index++) {               //操作商品总数的的4分之1次
-        $remove_index = random_int(0, (count($products) - 1) * 2);         //每次有50%可能性，去掉一个随机商品
-        array_splice($products, $remove_index, 1);       //去掉一个商品
-    }
-    foreach ($products as $product) {                                //循环插入地区的商品
-        MongoUtil::insert('product_of_place', [
-            '_id' => strval(random_int(1, 9999999)),
-            'product_id' => $product['_id'],
-            'place_id' => $place['_id']
-        ]);
-    }
     return array("code" => 200, "msg" => "success", "event" => $event);
+}
+
+function changePrice($product,$coefficient){
+    $new_price = $product['base_price'] *$coefficient;
+    $product['current_price'] = round($new_price, 2);
+    MongoUtil::insertOrUpdateById('product', $product);
 }
 
 

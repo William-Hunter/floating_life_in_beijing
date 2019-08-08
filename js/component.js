@@ -15,7 +15,7 @@ var bottomBar = Vue.extend({
                 </div>
                 <div class="col-md-2 col-sm-2">
                     <p>
-                        <button class="btn btn-primary btn-block" type="button" v-on:click="medic">江湖郎中</button>
+                        <button class="btn btn-primary btn-block" type="button" v-on:click="medic">青楼</button>
                     </p>
                 </div>
                 <div class="col-md-2 col-sm-2">
@@ -89,7 +89,7 @@ var bottomBar = Vue.extend({
         },
         medic: function () {
             console.log("medic")
-            window.location.href = web_root + "/medic.html"
+            window.location.href = web_root + "/hooker.html"
         },
         house: function () {
             console.log("house")

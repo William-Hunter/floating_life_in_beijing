@@ -115,12 +115,12 @@
             deal:function (surgery) {
                 var this_ = this;
                 if(surgery.price>vue.$refs.bottomBar.state.money){
-                    alert("医生从手术中抬起头，说：“您好象钱不够啊”");
+                    alert("美女从胯间抬起头，说：“您好象钱不够啊”");
                     return;
                 }
                 quest(API.dealSurgery, {surgeryId: surgery._id}, function (result) {
                     if (result.code == 200) {
-                        alert('手术成功，你花费了' + result.cost + '￥')
+                        alert('保健成功，你花费了' + result.cost + '￥')
                         this_.reload()
                     } else {
                         alert(result.msg)
