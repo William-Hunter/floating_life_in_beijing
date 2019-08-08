@@ -157,13 +157,12 @@ function sell($goodsId, $amount) {
 
 
 function afterDay($placeId) {
-
     $event = [];
 
     //价格波动
     $product_list = MongoUtil::query("product", [], null);
     foreach ($product_list as $product) {
-        changePrice($product,(random_int(5, 15) / 10.0));
+        Calc::changePrice($product,(random_int(5, 15) / 10.0));
     }
 
     //市场随机事件，
@@ -172,11 +171,10 @@ function afterDay($placeId) {
         $randomEventIndex=random_int(0, (count($event_list) - 1));
         $randomEvent=$event_list[$randomEventIndex];
         $product = MongoUtil::queryById('product', $randomEvent['product_id']);
-        changePrice($product,$randomEvent['coefficient']);
+        Calc::changePrice($product,$randomEvent['coefficient']);
         $riseOrDown=$randomEvent['coefficient']>=1?'上涨了':'下跌了';
         $event[] = $randomEvent['context'] .',价格'. $riseOrDown.($randomEvent['coefficient']*100).'%';
     }
-
 
 //  地区商品波动
     MongoUtil::delete('product_of_place', ['place_id' => $placeId]);
@@ -214,17 +212,21 @@ function afterDay($placeId) {
     //日子过去一天了，债务也在涨
     $debt = ($state['interest'] + 1) * $state['debt'];
     $state['debt'] = round($debt, 2);
+
+
+    //官府纠缠
+    if(random_int(0, 20)>10){
+        $forfeit=(random_int(0, 10)/10)*$state['crime'];
+        $state['money']=$state['money']-$forfeit;
+        $event[] = '因为你的罪恶之太高，被执法部门盯上了，罚了'.$forfeit.'￥';
+    }
+
     MongoUtil::insertOrUpdateById('character', $state);
-    
 
     return array("code" => 200, "msg" => "success", "event" => $event);
 }
 
-function changePrice($product,$coefficient){
-    $new_price = $product['base_price'] *$coefficient;
-    $product['current_price'] = round($new_price, 2);
-    MongoUtil::insertOrUpdateById('product', $product);
-}
+
 
 
 @$func = $_REQUEST['func'];

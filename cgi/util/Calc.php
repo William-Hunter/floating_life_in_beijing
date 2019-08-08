@@ -54,5 +54,11 @@ class Calc {
     }
 
 
+    function changePrice($product,$coefficient){
+        $new_price = $product['base_price'] *$coefficient;
+        $product['current_price'] = round($new_price, 2);
+        MongoUtil::insertOrUpdateById('product', $product);
+    }
+
 }
 ?>
