@@ -20,7 +20,7 @@ function buyBribery($briberyId) {
             throw new Exception("你没有足够钱去行贿");
         }
         $newCrime = $state['crime'] - $bribery['washout'];
-        $state["crime"] = (int)$newCrime;
+        $state["crime"] = (int)$newCrime<0?0:$newCrime;
         $newPrice = $state['money'] - $bribery['price'];
         $state["money"] = $newPrice;
         MongoUtil::insertOrUpdateById('character', $state);

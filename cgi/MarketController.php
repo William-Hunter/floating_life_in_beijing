@@ -167,7 +167,7 @@ function afterDay($placeId) {
 
     //市场随机事件，
     $event_list = MongoUtil::query("event", [], null);
-    if(random_int(0, 20)>10){
+    if(random_int(0, 20)>12){
         $randomEventIndex=random_int(0, (count($event_list) - 1));
         $randomEvent=$event_list[$randomEventIndex];
         $product = MongoUtil::queryById('product', $randomEvent['product_id']);
@@ -198,7 +198,7 @@ function afterDay($placeId) {
     $state['date'] = (int)$new_day;
 
     //健康损失随机事件
-    if (random_int(1, 10) > 7) {         //事件发生的机率
+    if (random_int(1, 10) > 8) {         //事件发生的机率
         $randomHurt = random_int(1, 20);
         $new_hurt=$state['health'] - $randomHurt;           //随机的伤害值
         $state['health']=$new_hurt<0?0:$new_hurt;           //不低于0
@@ -215,9 +215,10 @@ function afterDay($placeId) {
 
 
     //官府纠缠
-    if(random_int(0, 20)>10){
+    if(random_int(0, 20)>12){
         $forfeit=(random_int(0, 10)/10)*$state['crime'];
-        $state['money']=$state['money']-$forfeit;
+        $cut=$state['money']-$forfeit;
+        $state['money']=$cut<0?0:$cut;
         $event[] = '因为你的罪恶之太高，被执法部门盯上了，罚了'.$forfeit.'￥';
     }
 
